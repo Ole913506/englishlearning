@@ -1,0 +1,2463 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rechenheft — Mathe Klasse 5 bis 10</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   RECHENHEFT — Karopapier, Tinte, Blau für Aktionen,
+   Amber für den Klassenarbeitsmodus.
+   ============================================================ */
+:root{
+  --bg:#F6F8FC;
+  --card:#FFFFFF;
+  --ink:#0F172A;
+  --ink-2:#4A5578;
+  --ink-3:#8A94AE;
+  --line:#E2E7F1;
+  --karo:#E4EAF5;
+  --karo-2:#D2DCEE;
+  --accent:#2F5BEA;
+  --exam:#B45309;
+  --ok:#067A55;
+  --no:#D93A50;
+  --radius:12px;
+  --shadow:0 1px 0 rgba(15,23,42,.04), 0 10px 26px -18px rgba(15,23,42,.5);
+  --display:"Space Grotesk",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --body:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;font-family:var(--body);color:var(--ink);line-height:1.55;font-size:16px;
+  background-color:var(--bg);
+  background-image:
+    repeating-linear-gradient(to right, var(--karo) 0 1px, transparent 1px 25px),
+    repeating-linear-gradient(to bottom, var(--karo) 0 1px, transparent 1px 25px),
+    repeating-linear-gradient(to right, var(--karo-2) 0 1px, transparent 1px 125px),
+    repeating-linear-gradient(to bottom, var(--karo-2) 0 1px, transparent 1px 125px);
+  background-attachment:fixed;
+}
+h1,h2,h3,h4{font-family:var(--display);margin:0;line-height:1.15;letter-spacing:-.02em}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:4px}
+
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px 96px}
+.masthead{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;padding:34px 0 20px;flex-wrap:wrap}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin:0 0 6px}
+.masthead h1{font-size:clamp(30px,5vw,46px);font-weight:700}
+.masthead .tagline{color:var(--ink-2);font-size:14px;margin:6px 0 0;max-width:48ch}
+.chips{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chip{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:7px 14px;
+  font-family:var(--mono);font-size:12px;white-space:nowrap;box-shadow:var(--shadow)}
+.chip b{font-weight:600;color:var(--accent)}
+.chip.err b{color:var(--no)}
+
+/* Startseite */
+.klasse{margin:30px 0 12px;display:flex;align-items:baseline;gap:12px}
+.klasse h2{font-size:20px;font-weight:700}
+.klasse span{font-family:var(--mono);font-size:11px;color:var(--ink-3);letter-spacing:.1em;text-transform:uppercase}
+.klasse .rule{flex:1;height:1px;background:var(--line)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.topic{cursor:pointer;text-align:left;background:var(--card);border:1px solid var(--line);
+  border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);transition:.14s}
+.topic:hover{transform:translateY(-2px);border-color:#C4CFE6}
+.topic .tname{display:block;font-family:var(--display);font-size:17px;font-weight:600;margin-bottom:5px}
+.topic .tdesc{display:block;font-size:13px;color:var(--ink-2)}
+.topic.alert{border-color:rgba(217,58,80,.45);background:linear-gradient(180deg,rgba(217,58,80,.05),#fff 70%)}
+.topic.exam{border-color:rgba(180,83,9,.4);background:linear-gradient(180deg,rgba(180,83,9,.06),#fff 70%)}
+
+/* Übungsansicht */
+.bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:8px 0 16px}
+.back{background:none;border:none;cursor:pointer;font-family:var(--mono);font-size:12px;color:var(--ink-2);
+  text-decoration:underline;text-underline-offset:3px;padding:6px 2px}
+.back:hover{color:var(--accent)}
+.drill-title{font-size:clamp(21px,3.4vw,29px);font-weight:700}
+.modes{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.mode{cursor:pointer;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:13px;transition:.12s}
+.mode:hover{border-color:var(--ink-3)}
+.mode[aria-selected="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.mode.examtab[aria-selected="true"]{background:var(--exam);border-color:var(--exam)}
+.subs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 20px}
+.sub{cursor:pointer;background:transparent;border:1px solid var(--line);border-radius:8px;padding:5px 11px;
+  font-size:12.5px;color:var(--ink-2);transition:.12s}
+.sub:hover{border-color:var(--ink-3);color:var(--ink)}
+.sub[aria-selected="true"]{background:#fff;border-color:var(--accent);color:var(--accent);font-weight:600}
+
+.sheet{position:relative;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:24px 26px}
+.sheet.exam{border-color:rgba(180,83,9,.35)}
+.qmeta{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin-bottom:12px}
+.qtext{font-family:var(--display);font-size:clamp(19px,2.6vw,25px);font-weight:500;line-height:1.4}
+.qtext .m{font-family:var(--mono);font-weight:600;white-space:nowrap}
+.qsub{color:var(--ink-2);font-size:14px;margin-top:10px}
+
+.answers{display:grid;gap:9px;margin-top:20px}
+.opt{cursor:pointer;text-align:left;background:var(--bg);border:1px solid var(--line);border-radius:10px;
+  padding:12px 15px;font-size:16px;transition:.12s}
+.opt:hover:not(:disabled){border-color:var(--accent);background:#fff}
+.opt.right{border-color:var(--ok);background:rgba(6,122,85,.07);color:var(--ok);font-weight:600}
+.opt.wrong{border-color:var(--no);background:rgba(217,58,80,.07);color:var(--no)}
+
+.fields{display:flex;gap:14px;flex-wrap:wrap;margin-top:20px;align-items:flex-end}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-family:var(--mono);font-size:11px;color:var(--ink-3);letter-spacing:.08em;text-transform:uppercase}
+.field .row{display:flex;align-items:baseline;gap:7px}
+.field input{font:inherit;font-family:var(--mono);font-size:19px;width:170px;max-width:46vw;color:var(--ink);
+  background:transparent;border:none;border-bottom:2px solid var(--line);padding:7px 2px}
+.field input:focus{outline:none;border-bottom-color:var(--accent)}
+.field .unit{font-family:var(--mono);font-size:14px;color:var(--ink-2)}
+.actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+.btn{cursor:pointer;border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:10px;
+  padding:11px 20px;font-size:15px;font-weight:600;transition:.12s}
+.btn:hover{background:#1E293B}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.ghost:hover{border-color:var(--ink-3)}
+.btn.accent{background:var(--accent);border-color:var(--accent)}
+.btn.accent:hover{background:#2449C4}
+.btn.exam{background:var(--exam);border-color:var(--exam)}
+.btn.exam:hover{background:#92400E}
+
+.verdict{margin-top:20px;padding:14px 16px;border-radius:10px;font-size:15px;display:none}
+.verdict.show{display:block;animation:rise .18s ease-out}
+.verdict.ok{background:rgba(6,122,85,.07);color:var(--ok);border:1px solid rgba(6,122,85,.3)}
+.verdict.no{background:rgba(217,58,80,.06);color:var(--no);border:1px solid rgba(217,58,80,.3)}
+.verdict b{font-family:var(--mono)}
+.verdict .why{display:block;margin-top:8px;color:var(--ink-2);font-size:14px;line-height:1.6}
+.verdict .why b{color:var(--ink)}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.progress{display:flex;align-items:center;gap:10px;margin-top:18px;font-family:var(--mono);font-size:11.5px;color:var(--ink-3)}
+.pbar{flex:1;height:4px;background:var(--line);border-radius:99px;overflow:hidden}
+.pbar i{display:block;height:100%;background:var(--accent);width:0;transition:width .25s}
+.pbar.exam i{background:var(--exam)}
+
+/* Erklärung */
+.ref h3{font-size:20px;margin:30px 0 10px;font-weight:700}
+.ref h3:first-child{margin-top:0}
+.ref p{font-size:15px;color:var(--ink-2);margin:0 0 10px}
+.ref .lead{font-size:16.5px;color:var(--ink);margin-bottom:16px;max-width:70ch}
+.ref .rule{background:var(--bg);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;
+  padding:12px 14px;margin:12px 0;font-size:15px}
+.ref .rule b{color:var(--ink)}
+.ref .ex{font-family:var(--mono);font-size:14.5px;background:#fff;border:1px dashed var(--karo-2);
+  border-radius:8px;padding:11px 13px;margin:10px 0;line-height:1.9}
+.ref ol.steps{counter-reset:st;list-style:none;padding:0;margin:14px 0}
+.ref ol.steps li{position:relative;padding:2px 0 0 42px;margin:0 0 13px;font-size:15px}
+.ref ol.steps li::before{counter-increment:st;content:counter(st);position:absolute;left:0;top:0;width:26px;height:26px;
+  border-radius:7px;background:var(--accent);color:#fff;font-family:var(--mono);font-size:12px;
+  display:flex;align-items:center;justify-content:center}
+.tbl{width:100%;border-collapse:collapse;font-size:14.5px;margin:8px 0 14px}
+.tbl th,.tbl td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:500}
+.tbl td.f{font-family:var(--mono);font-weight:600}
+
+/* Brüche & Formeln */
+.frac{display:inline-flex;flex-direction:column;vertical-align:-0.55em;text-align:center;margin:0 3px;font-family:var(--mono)}
+.frac span:first-child{border-bottom:1.6px solid currentColor;padding:0 4px;line-height:1.25}
+.frac span:last-child{padding:0 4px;line-height:1.25}
+
+/* Klassenarbeit */
+.exambar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:14px;
+  font-family:var(--mono);font-size:12px;color:var(--ink-2)}
+.exambar .tag{background:rgba(180,83,9,.1);color:var(--exam);border-radius:6px;padding:3px 9px;font-weight:600}
+.result{display:flex;gap:20px;flex-wrap:wrap;align-items:center;margin:6px 0 18px}
+.note{font-family:var(--display);font-size:56px;font-weight:700;line-height:1;color:var(--exam)}
+.result .meta{font-family:var(--mono);font-size:13px;color:var(--ink-2);line-height:1.9}
+.review{border-top:1px solid var(--line);margin-top:8px}
+.rev{padding:13px 0;border-bottom:1px solid var(--line);font-size:14.5px}
+.rev .rq{font-weight:600;margin-bottom:5px}
+.rev .ra{font-family:var(--mono);font-size:13px}
+.rev .ra .mine{color:var(--no)}
+.rev .ra .good{color:var(--ok)}
+.rev.okrow .rq::before{content:"✓ ";color:var(--ok);font-weight:700}
+.rev.norow .rq::before{content:"✗ ";color:var(--no);font-weight:700}
+.rev .sol{color:var(--ink-2);font-size:13.5px;margin-top:5px;line-height:1.65}
+
+.foot{margin-top:44px;font-size:12.5px;color:var(--ink-3);font-family:var(--mono);text-align:center}
+
+@media (max-width:640px){
+  body{background-image:
+    repeating-linear-gradient(to right, var(--karo) 0 1px, transparent 1px 22px),
+    repeating-linear-gradient(to bottom, var(--karo) 0 1px, transparent 1px 22px)}
+  .wrap{padding:0 14px 80px}
+  .sheet{padding:20px 18px}
+  .field input{width:100%}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <div>
+      <p class="eyebrow">Rechenheft · Klasse 5 – 10</p>
+      <h1>Mathe üben</h1>
+      <p class="tagline">Erklärungen, endlos neue Aufgaben mit anderen Zahlen und ein Klassenarbeitsmodus für jedes Thema.</p>
+    </div>
+    <div class="chips">
+      <span class="chip">Richtig <b id="statOk">0</b></span>
+      <span class="chip">Aufgaben <b id="statAll">0</b></span>
+      <span class="chip">Serie <b id="statStreak">0</b></span>
+      <span class="chip err" id="errChip" hidden>Fehler <b id="statErr">0</b></span>
+    </div>
+  </header>
+
+  <section id="home"><div id="topicGrid"></div></section>
+
+  <section id="drill" hidden>
+    <div class="bar">
+      <button class="back" id="btnBack">← Alle Themen</button>
+      <h2 class="drill-title" id="drillTitle"></h2>
+    </div>
+    <div class="modes" id="modeTabs" role="tablist"></div>
+    <div class="subs" id="subTabs" hidden></div>
+    <div id="stage"></div>
+  </section>
+
+  <p class="foot">Zahlen werden bei jeder Aufgabe neu gewürfelt — dieselbe Aufgabe kommt nie zweimal gleich.</p>
+</div>
+<script>
+/* ============================================================
+   1. WERKZEUGE
+   Alle Aufgaben werden erzeugt, nicht gespeichert — jede
+   Wiederholung bekommt neue Zahlen.
+   ============================================================ */
+const R    = (a,b) => a + Math.floor(Math.random()*(b-a+1));
+const Rn   = (a,b) => { let v = 0; while(v === 0) v = R(a,b); return v; };      // ohne Null
+const pick = a => a[Math.floor(Math.random()*a.length)];
+const shuffle = a => a.map(v => [Math.random(), v]).sort((x,y) => x[0]-y[0]).map(p => p[1]);
+const gcd  = (a,b) => { a = Math.abs(a); b = Math.abs(b); while(b){ [a,b] = [b, a%b]; } return a || 1; };
+const lcm  = (a,b) => Math.abs(a*b)/gcd(a,b);
+const red  = (a,b) => { const g = gcd(a,b); return b < 0 ? [-a/g, -b/g] : [a/g, b/g]; };
+const isPrime = n => { if(n < 2) return false; for(let i = 2; i*i <= n; i++) if(n%i === 0) return false; return true; };
+const primeFactors = n => { const f = []; for(let p = 2; p*p <= n; p++) while(n%p === 0){ f.push(p); n /= p; } if(n > 1) f.push(n); return f; };
+const divisors = n => { const d = []; for(let i = 1; i <= n; i++) if(n%i === 0) d.push(i); return d; };
+const round = (x, d = 2) => Math.round((x + Number.EPSILON) * 10**d) / 10**d;
+
+/* Deutsche Zahlformatierung: Komma statt Punkt */
+function fmt(n, dec){
+  if(!isFinite(n)) return "—";
+  let s = dec == null ? String(round(n, 6)) : round(n, dec).toFixed(dec);
+  return s.replace(".", ",");
+}
+const eur = n => fmt(n, 2) + " €";
+
+/* Darstellung */
+const m    = s => `<span class="m">${s}</span>`;
+const frac = (a,b) => `<span class="frac"><span>${a}</span><span>${b}</span></span>`;
+const pow  = (b,e) => `${b}<sup>${e}</sup>`;
+const sq   = s => `√<span style="border-top:1.4px solid currentColor;padding:0 2px">${s}</span>`;
+/* Vorzeichenbehaftete Terme sauber schreiben: 3x - 5 statt 3x + -5 */
+const pmt  = (n, v = "") => (n < 0 ? " − " : " + ") + ((v && Math.abs(n) === 1) ? v : Math.abs(n) + v);
+const sgn  = n => (n < 0 ? " − " : " + ") + Math.abs(n);
+const koef = (k, v) => k === 1 ? v : k === -1 ? "−"+v : k + v;
+
+/* ---------- Antwortprüfung ---------- */
+function parseVal(s){
+  if(s == null) return NaN;
+  let t = String(s).trim().toLowerCase()
+    .replace(/[\s\u00a0]/g, "")
+    .replace(/€|%|°/g, "")
+    .replace(/[a-zäöüß²³]+$/g, "")                            // Einheit am Ende
+    .replace(/,/g, ".")
+    .replace(/^\+/, "");
+  if(/^-?\d+(\.\d+)?\/-?\d+(\.\d+)?$/.test(t)){
+    const [a,b] = t.split("/").map(Number);
+    return b === 0 ? NaN : a/b;
+  }
+  if(/^-?\d+(\.\d+)?$/.test(t)) return Number(t);
+  return NaN;
+}
+const normTxt = s => String(s == null ? "" : s).toLowerCase()
+  .replace(/\s|\u00a0/g,"").replace(/[·x×]/g,"*").replace(/[−–]/g,"-").replace(/:/g,"/")
+  .replace(/\*/g,"").replace(/,/g,".");
+
+function checkField(f, raw){
+  if(raw == null || String(raw).trim() === "") return false;
+  if(f.a) return f.a.some(x => normTxt(x) === normTxt(raw));
+  const v = parseVal(raw);
+  if(!isFinite(v)) return false;
+  if(f.frac){                                    // gekürzte Bruchform verlangt
+    const [p,q] = f.frac;
+    if(Math.abs(v - p/q) > 1e-9) return false;
+    const mm = String(raw).replace(/\s/g,"").match(/^(-?\d+)\/(-?\d+)$/);
+    return mm ? gcd(+mm[1], +mm[2]) === 1 : true;
+  }
+  const t = f.tol != null ? f.tol
+          : f.dec != null ? 0.5 * 10**(-f.dec) + 1e-9
+          : Math.max(1e-6, Math.abs(f.num) * 1e-6);
+  return Math.abs(v - f.num) <= t;
+}
+const fieldsOf = t => t.fields || [{num:t.num, a:t.a, frac:t.frac, dec:t.dec, tol:t.tol, unit:t.unit, label:t.label}];
+const checkTask = (t, ins) => fieldsOf(t).every((f,i) => checkField(f, ins[i]));
+function solutionOf(t){
+  return fieldsOf(t).map(f => f.a ? f.a[0]
+    : f.frac ? f.frac[0] + "/" + f.frac[1]
+    : fmt(f.num, f.dec) + (f.unit ? " " + f.unit : "")).join("   ·   ");
+}
+</script>
+<script>
+/* ============================================================
+   2. THEMEN — jede Aufgabe wird frisch gewürfelt
+   Aufgabenobjekt: {q, sol, hint?, unit?, dec?,
+                    num | a | frac | fields | opts+ai}
+   ============================================================ */
+const TOPICS = [];
+const T = o => TOPICS.push(o);
+
+/* ---------------- KLASSE 5 ---------------- */
+
+T({id:"zahlen", kl:5, title:"Große Zahlen & Runden", desc:"Stellenwerte, Runden, Überschlag.",
+expl:`<p class="lead">Jede Ziffer hat einen Platz, und der Platz bestimmt ihren Wert. In 47 382 ist die 7 keine Sieben, sondern sieben <b>Tausender</b>, also 7000.</p>
+<h3>Stellenwerte</h3>
+<table class="tbl"><tr><th>ZT</th><th>T</th><th>H</th><th>Z</th><th>E</th></tr>
+<tr><td class="f">4</td><td class="f">7</td><td class="f">3</td><td class="f">8</td><td class="f">2</td></tr></table>
+<p>4 Zehntausender + 7 Tausender + 3 Hunderter + 8 Zehner + 2 Einer.</p>
+<h3>Runden</h3>
+<ol class="steps">
+<li>Suche die Stelle, auf die gerundet werden soll, und markiere sie.</li>
+<li>Schau auf die <b>Ziffer rechts daneben</b> — nur die zählt.</li>
+<li>0, 1, 2, 3, 4 → abrunden (Stelle bleibt). 5, 6, 7, 8, 9 → aufrunden (Stelle +1).</li>
+<li>Alle Ziffern rechts davon werden zu Nullen.</li>
+</ol>
+<div class="ex">47 382 auf Tausender → Ziffer rechts der Tausenderstelle ist 3 → abrunden → 47 000<br>
+47 <b>8</b>32 auf Tausender → rechts steht 8 → aufrunden → 48 000</div>
+<div class="rule"><b>Überschlag:</b> Erst runden, dann rechnen. Das Ergebnis ist ungenau, zeigt aber sofort, ob dein
+richtiges Ergebnis überhaupt plausibel ist. 4812 + 3197 ≈ 4800 + 3200 = 8000.</div>`,
+gens:[
+ {id:"runden", label:"Runden", make(){
+   const st = pick([[10,"Zehner"],[100,"Hunderter"],[1000,"Tausender"],[10000,"Zehntausender"]]);
+   const n = R(st[0]*2, st[0]*98) + R(1, st[0]-1);
+   const a = Math.round(n/st[0])*st[0];
+   return {q:`Runde ${m(n.toLocaleString("de-DE"))} auf ${st[1]}.`, num:a,
+     sol:`Die Ziffer rechts der ${st[1]}stelle entscheidet. Ergebnis: <b>${a.toLocaleString("de-DE")}</b>.`};
+ }},
+ {id:"stelle", label:"Stellenwert", make(){
+   const n = R(100000, 999999), s = String(n);
+   const names = ["Hunderttausender","Zehntausender","Tausender","Hunderter","Zehner","Einer"];
+   const i = R(0,5);
+   return {q:`Welche Ziffer steht in ${m(n.toLocaleString("de-DE"))} an der ${names[i]}stelle?`, num:+s[i],
+     sol:`Von links: ${names.map((x,k)=>`${x} = ${s[k]}`).join(" · ")}.`};
+ }},
+ {id:"ueberschlag", label:"Überschlag", make(){
+   const a = R(1200,8900), b = R(1200,8900);
+   const ra = Math.round(a/100)*100, rb = Math.round(b/100)*100;
+   return {q:`Überschlage ${m(a+" + "+b)}, indem du beide Zahlen auf Hunderter rundest.`, num:ra+rb,
+     sol:`${a} ≈ ${ra} und ${b} ≈ ${rb} → ${ra} + ${rb} = <b>${ra+rb}</b> (genau wären es ${a+b}).`};
+ }},
+ {id:"ordnen", label:"Zahlen bauen", make(){
+   const ds = shuffle([R(1,9),R(1,9),R(1,9),R(1,9)]);
+   const gross = +[...ds].sort((x,y)=>y-x).join("");
+   const klein = +[...ds].sort((x,y)=>x-y).join("");
+   const gr = Math.random() < .5;
+   return {q:`Bilde aus den Ziffern ${m(ds.join(", "))} die ${gr?"größte":"kleinste"} vierstellige Zahl.`,
+     num: gr ? gross : klein,
+     sol:`Ziffern der Größe nach ordnen: größte = ${gross}, kleinste = ${klein}.`};
+ }}]});
+
+T({id:"grundrechnen", kl:5, title:"Grundrechenarten", desc:"Schriftlich rechnen, Klammern, Punkt vor Strich.",
+expl:`<p class="lead">Vier Rechenarten, aber nur eine Reihenfolge-Regel — und die entscheidet über fast alle Flüchtigkeitsfehler.</p>
+<h3>Die Reihenfolge</h3>
+<ol class="steps">
+<li><b>Klammern zuerst</b> — was eingeklammert ist, wird ein Paket.</li>
+<li><b>Punkt vor Strich</b>: mal und geteilt kommen vor plus und minus.</li>
+<li>Sonst <b>von links nach rechts</b>.</li>
+</ol>
+<div class="ex">7 · (12 + 8) − 45 = 7 · 20 − 45 = 140 − 45 = <b>95</b><br>
+7 · 12 + 8 − 45 = 84 + 8 − 45 = <b>47</b> — dieselben Zahlen, anderes Ergebnis!</div>
+<h3>Division mit Rest</h3>
+<div class="rule">847 : 6 = 141 Rest 1, denn 141 · 6 = 846 und es bleibt 1 übrig.
+<b>Probe:</b> Ergebnis · Divisor + Rest = Ausgangszahl. Der Rest ist immer kleiner als der Divisor.</div>
+<h3>Rechenvorteile</h3>
+<div class="rule">Zahlen darf man beim Addieren und Multiplizieren umsortieren:
+25 · 17 · 4 = 25 · 4 · 17 = 100 · 17 = 1700. Das spart Rechenarbeit und Fehler.</div>`,
+gens:[
+ {id:"plusminus", label:"Plus & Minus", make(){
+   const a = R(1000,9999), b = R(1000,9999), plus = Math.random()<.5;
+   const big = Math.max(a,b), sm = Math.min(a,b);
+   return plus ? {q:`Berechne ${m(a+" + "+b)}`, num:a+b, sol:`${a} + ${b} = <b>${a+b}</b>`}
+               : {q:`Berechne ${m(big+" − "+sm)}`, num:big-sm, sol:`${big} − ${sm} = <b>${big-sm}</b>`};
+ }},
+ {id:"malteil", label:"Mal & Geteilt", make(){
+   if(Math.random() < .5){
+     const a = R(112,989), b = R(12,89);
+     return {q:`Berechne ${m(a+" · "+b)}`, num:a*b, sol:`${a} · ${b} = <b>${a*b}</b>`};
+   }
+   const b = R(3,9), e = R(24,199), r = R(0,b-1), a = b*e + r;
+   return {q:`Berechne ${m(a+" : "+b)} mit Rest.`,
+     fields:[{label:"Ergebnis", num:e},{label:"Rest", num:r}],
+     sol:`${b} · ${e} = ${b*e}, dazu der Rest ${r}. Probe: ${b*e} + ${r} = ${a}.`};
+ }},
+ {id:"klammern", label:"Klammern & Reihenfolge", make(){
+   const a = R(3,9), b = R(6,19), c = R(3,15), d = R(20,90);
+   const v = a*(b+c) - d;
+   return {q:`Berechne ${m(`${a} · (${b} + ${c}) − ${d}`)}`, num:v,
+     sol:`Klammer zuerst: ${b} + ${c} = ${b+c}. Dann Punkt vor Strich: ${a} · ${b+c} = ${a*(b+c)}. Zuletzt − ${d} → <b>${v}</b>.`};
+ }},
+ {id:"vorteil", label:"Rechenvorteile", make(){
+   const p = pick([[25,4],[50,2],[20,5],[125,8]]);
+   const x = R(12,89);
+   return {q:`Berechne geschickt: ${m(`${p[0]} · ${x} · ${p[1]}`)}`, num:p[0]*p[1]*x,
+     sol:`Erst ${p[0]} · ${p[1]} = ${p[0]*p[1]} rechnen, dann · ${x} → <b>${p[0]*p[1]*x}</b>.`};
+ }}]});
+
+T({id:"teiler", kl:5, title:"Teiler, Primzahlen, ggT & kgV", desc:"Teilbarkeit, Primfaktoren, größter gemeinsamer Teiler.",
+expl:`<p class="lead">Ein <b>Teiler</b> von 12 ist jede Zahl, durch die 12 ohne Rest teilbar ist: 1, 2, 3, 4, 6, 12. Ein <b>Vielfaches</b> von 12 ist 12, 24, 36, …</p>
+<h3>Teilbarkeitsregeln</h3>
+<table class="tbl">
+<tr><td class="f">durch 2</td><td>letzte Ziffer ist gerade</td><td class="f">durch 5</td><td>endet auf 0 oder 5</td></tr>
+<tr><td class="f">durch 3</td><td>Quersumme durch 3 teilbar</td><td class="f">durch 9</td><td>Quersumme durch 9 teilbar</td></tr>
+<tr><td class="f">durch 4</td><td>letzte zwei Ziffern durch 4 teilbar</td><td class="f">durch 10</td><td>endet auf 0</td></tr>
+</table>
+<h3>Primzahlen</h3>
+<div class="rule">Eine Primzahl hat <b>genau zwei</b> Teiler: 1 und sich selbst. 2, 3, 5, 7, 11, 13, 17, 19, 23, 29 …
+Die 1 ist <b>keine</b> Primzahl (nur ein Teiler), die 2 ist die einzige gerade Primzahl.<br>
+Zum Prüfen reicht es, durch alle Primzahlen bis zur Wurzel zu teilen: Bei 91 genügen 2, 3, 5, 7 — und 91 = 7 · 13, also keine Primzahl.</div>
+<h3>ggT und kgV über Primfaktoren</h3>
+<ol class="steps">
+<li>Beide Zahlen in Primfaktoren zerlegen: 36 = 2·2·3·3, 60 = 2·2·3·5.</li>
+<li><b>ggT</b>: alle <b>gemeinsamen</b> Faktoren malnehmen → 2·2·3 = 12.</li>
+<li><b>kgV</b>: alle Faktoren nehmen, jeden so oft, wie er höchstens vorkommt → 2·2·3·3·5 = 180.</li>
+<li>Kontrolle: ggT · kgV = a · b.</li>
+</ol>`,
+gens:[
+ {id:"teilbar", label:"Teilbarkeit", make(){
+   const d = pick([3,4,9]), n = R(120, 9999);
+   const ja = n % d === 0;
+   return {q:`Ist ${m(n)} durch ${m(d)} teilbar?`, opts:["ja","nein"], ai: ja?0:1,
+     sol: d === 4 ? `Letzte zwei Ziffern: ${String(n).slice(-2)} → ${ja?"":"nicht "}durch 4 teilbar.`
+        : `Quersumme von ${n} ist ${String(n).split("").reduce((s,c)=>s+ +c,0)} → ${ja?"":"nicht "}durch ${d} teilbar.`};
+ }},
+ {id:"prim", label:"Primzahlen", make(){
+   const n = pick([...Array(80).keys()].map(i=>i+20));
+   return {q:`Ist ${m(n)} eine Primzahl?`, opts:["ja","nein"], ai: isPrime(n)?0:1,
+     sol: isPrime(n) ? `${n} ist nur durch 1 und ${n} teilbar.` :
+       `${n} = ${primeFactors(n).join(" · ")} — also mehr als zwei Teiler.`};
+ }},
+ {id:"primfaktor", label:"Primfaktoren", make(){
+   const n = R(24, 300), f = primeFactors(n);
+   return {q:`Wie lautet der <b>größte</b> Primfaktor von ${m(n)}?`, num:Math.max(...f),
+     sol:`${n} = ${f.join(" · ")} → größter Primfaktor <b>${Math.max(...f)}</b>.`};
+ }},
+ {id:"ggtkgv", label:"ggT & kgV", make(){
+   const a = R(12,80), b = R(12,80);
+   return {q:`Bestimme ggT und kgV von ${m(a)} und ${m(b)}.`,
+     fields:[{label:"ggT", num:gcd(a,b)},{label:"kgV", num:lcm(a,b)}],
+     sol:`${a} = ${primeFactors(a).join("·")}, ${b} = ${primeFactors(b).join("·")}.
+       ggT = <b>${gcd(a,b)}</b>, kgV = <b>${lcm(a,b)}</b>. Probe: ${gcd(a,b)} · ${lcm(a,b)} = ${a*b} = ${a} · ${b}.`};
+ }}]});
+
+T({id:"groessen", kl:5, title:"Größen & Einheiten", desc:"Länge, Masse, Zeit und Geld umrechnen.",
+expl:`<p class="lead">Umrechnen heißt: mit der Umrechnungszahl mal- oder geteiltnehmen. Die Frage ist nur, in welche Richtung.</p>
+<div class="rule"><b>Merksatz:</b> Von der <b>großen</b> Einheit in die <b>kleine</b> → <b>mal</b>nehmen (die Zahl wird größer).
+Von der kleinen in die große → <b>teilen</b>.<br>
+3,4 km → m: km ist größer als m, also mal 1000 → 3400 m.</div>
+<h3>Umrechnungszahlen</h3>
+<table class="tbl">
+<tr><td class="f">Länge</td><td>km — 1000 — m — 10 — dm — 10 — cm — 10 — mm</td></tr>
+<tr><td class="f">Masse</td><td>t — 1000 — kg — 1000 — g — 1000 — mg</td></tr>
+<tr><td class="f">Zeit</td><td>Tag — 24 — h — 60 — min — 60 — s</td></tr>
+<tr><td class="f">Fläche</td><td>immer die <b>Quadrat</b>zahl: 1 m² = 100 dm² = 10 000 cm²</td></tr>
+<tr><td class="f">Volumen</td><td>immer hoch drei: 1 m³ = 1000 dm³ = 1 000 000 cm³ · 1 dm³ = 1 l</td></tr>
+</table>
+<div class="rule"><b>Die häufigste Falle:</b> Bei Flächen und Volumen ist die Umrechnungszahl nicht 10, sondern 100 bzw. 1000.
+Ein Quadrat von 1 m Seitenlänge hat 100 cm · 100 cm = 10 000 cm².</div>`,
+gens:[
+ {id:"laenge", label:"Länge", make(){
+   const p = pick([["km","m",1000],["m","cm",100],["m","mm",1000],["cm","mm",10],["km","cm",100000]]);
+   const runter = Math.random() < .6;
+   const v = runter ? round(R(15,995)/10,1) : R(120, 9800);
+   return runter
+     ? {q:`${m(fmt(v)+" "+p[0])} = ? ${p[1]}`, num:v*p[2], unit:p[1],
+        sol:`Von ${p[0]} nach ${p[1]}: mal ${p[2]} → <b>${fmt(v*p[2])} ${p[1]}</b>.`}
+     : {q:`${m(v+" "+p[1])} = ? ${p[0]}`, num:v/p[2], unit:p[0], dec:5,
+        sol:`Von ${p[1]} nach ${p[0]}: geteilt durch ${p[2]} → <b>${fmt(v/p[2])} ${p[0]}</b>.`};
+ }},
+ {id:"masse", label:"Masse", make(){
+   const p = pick([["kg","g",1000],["t","kg",1000],["g","mg",1000]]);
+   const v = round(R(12,980)/10, 1);
+   return {q:`${m(fmt(v)+" "+p[0])} = ? ${p[1]}`, num:v*p[2], unit:p[1],
+     sol:`mal ${p[2]} → <b>${fmt(v*p[2])} ${p[1]}</b>.`};
+ }},
+ {id:"zeit", label:"Zeit", make(){
+   const h = R(1,5), mi = R(5,55);
+   if(Math.random() < .5)
+     return {q:`${m(h+" h "+mi+" min")} = ? min`, num:h*60+mi, unit:"min",
+       sol:`${h} · 60 = ${h*60}, plus ${mi} → <b>${h*60+mi} min</b>.`};
+   const tot = h*60+mi;
+   return {q:`${m(tot+" min")} = ? h und ? min`,
+     fields:[{label:"Stunden", num:h},{label:"Minuten", num:mi}],
+     sol:`${tot} : 60 = ${h} Rest ${mi} → <b>${h} h ${mi} min</b>.`};
+ }},
+ {id:"flaeche_u", label:"Flächen- & Raummaße", make(){
+   const p = pick([["m²","cm²",10000],["m²","dm²",100],["dm²","cm²",100],["m³","dm³",1000],["dm³","cm³",1000]]);
+   const v = R(2,45);
+   return {q:`${m(v+" "+p[0])} = ? ${p[1]}`, num:v*p[2], unit:p[1],
+     sol:`Achtung, ${p[0].includes("³")?"Raum":"Flächen"}maß: mal ${p[2]} → <b>${(v*p[2]).toLocaleString("de-DE")} ${p[1]}</b>.`};
+ }},
+ {id:"geld", label:"Geld & Sachaufgaben", make(){
+   const n = R(3,12), pr = round(R(85,1290)/100, 2);
+   return {q:`${m(n)} Hefte kosten je ${m(fmt(pr,2)+" €")}. Was kosten sie zusammen?`,
+     num:round(n*pr,2), unit:"€", dec:2,
+     sol:`${n} · ${fmt(pr,2)} € = <b>${eur(round(n*pr,2))}</b>.`};
+ }}]});
+
+T({id:"flaeche1", kl:5, title:"Umfang & Fläche: Rechteck", desc:"Rechteck und Quadrat, auch rückwärts gerechnet.",
+expl:`<p class="lead">Der <b>Umfang</b> ist der Weg einmal außen herum, der <b>Flächeninhalt</b> sagt, wie viele Einheitsquadrate hineinpassen.</p>
+<h3>Die Formeln</h3>
+<div class="ex">Rechteck: U = 2 · (a + b)   ·   A = a · b<br>Quadrat:  U = 4 · a   ·   A = a · a = a²</div>
+<h3>Warum A = a · b?</h3>
+<p>Ein Rechteck mit a = 5 cm und b = 3 cm besteht aus 3 Reihen zu je 5 Quadratzentimetern — also 3 · 5 = 15 cm².
+Deshalb ist die Einheit beim Flächeninhalt immer eine <b>Quadrat</b>einheit.</p>
+<h3>Rückwärts rechnen</h3>
+<ol class="steps">
+<li>Formel hinschreiben: A = a · b.</li>
+<li>Einsetzen, was du weißt: 96 = 12 · b.</li>
+<li>Nach der gesuchten Größe umstellen: b = 96 : 12 = 8 cm.</li>
+</ol>
+<div class="rule"><b>Typische Falle:</b> Umfang und Fläche verwechseln. Der Umfang wird in cm gemessen (eine Länge),
+die Fläche in cm² (eine Fläche). Wenn im Ergebnis die Einheit nicht passt, hast du die falsche Formel benutzt.</div>`,
+gens:[
+ {id:"rechteck", label:"Rechteck", make(){
+   const a = R(4,25), b = R(3,20);
+   return {q:`Ein Rechteck ist ${m(a+" cm")} lang und ${m(b+" cm")} breit. Berechne Umfang und Flächeninhalt.`,
+     fields:[{label:"Umfang", num:2*(a+b), unit:"cm"},{label:"Fläche", num:a*b, unit:"cm²"}],
+     sol:`U = 2 · (${a} + ${b}) = <b>${2*(a+b)} cm</b> · A = ${a} · ${b} = <b>${a*b} cm²</b>`};
+ }},
+ {id:"quadrat", label:"Quadrat", make(){
+   const a = R(3,20);
+   if(Math.random() < .5)
+     return {q:`Ein Quadrat hat die Seitenlänge ${m(a+" cm")}. Berechne Umfang und Fläche.`,
+       fields:[{label:"Umfang", num:4*a, unit:"cm"},{label:"Fläche", num:a*a, unit:"cm²"}],
+       sol:`U = 4 · ${a} = <b>${4*a} cm</b> · A = ${a}² = <b>${a*a} cm²</b>`};
+   return {q:`Ein Quadrat hat den Umfang ${m(4*a+" cm")}. Wie lang ist eine Seite?`, num:a, unit:"cm",
+     sol:`a = U : 4 = ${4*a} : 4 = <b>${a} cm</b>`};
+ }},
+ {id:"rueck", label:"Rückwärts", make(){
+   const a = R(4,20), b = R(3,18);
+   return {q:`Ein Rechteck hat den Flächeninhalt ${m(a*b+" cm²")} und ist ${m(a+" cm")} lang. Wie breit ist es?`,
+     num:b, unit:"cm",
+     sol:`A = a · b → b = A : a = ${a*b} : ${a} = <b>${b} cm</b>`};
+ }},
+ {id:"zusammen", label:"Zusammengesetzte Flächen", make(){
+   const a = R(8,20), b = R(6,15), c = R(2,Math.min(a,b)-1);
+   return {q:`Aus einem Rechteck (${m(a+" cm")} × ${m(b+" cm")}) wird an einer Ecke ein Quadrat mit der Seite ${m(c+" cm")} herausgeschnitten. Wie groß ist die Restfläche?`,
+     num:a*b - c*c, unit:"cm²",
+     sol:`A = ${a} · ${b} − ${c}² = ${a*b} − ${c*c} = <b>${a*b-c*c} cm²</b>`};
+ }}]});
+
+T({id:"quader", kl:5, title:"Quader & Volumen", desc:"Volumen und Oberfläche von Quader und Würfel.",
+expl:`<p class="lead">Das <b>Volumen</b> sagt, wie viel hineinpasst, die <b>Oberfläche</b>, wie viel Papier man zum Einpacken braucht.</p>
+<h3>Volumen</h3>
+<div class="ex">Quader: V = a · b · c   ·   Würfel: V = a³</div>
+<p>Ein Quader mit 4 · 3 · 2 cm besteht aus 2 Schichten zu je 4 · 3 = 12 Würfelchen, also 24 cm³.
+Deshalb ist die Einheit eine <b>Kubik</b>einheit.</p>
+<h3>Oberfläche</h3>
+<ol class="steps">
+<li>Ein Quader hat 6 Flächen, die paarweise gleich sind.</li>
+<li>Drei verschiedene Rechtecke: a·b (oben/unten), a·c (vorn/hinten), b·c (links/rechts).</li>
+<li>Jedes zählt doppelt: O = 2 · (a·b + a·c + b·c).</li>
+</ol>
+<div class="ex">a = 5, b = 4, c = 3 → O = 2 · (20 + 15 + 12) = 2 · 47 = 94 cm²<br>Würfel: O = 6 · a²</div>
+<div class="rule"><b>1 dm³ = 1 Liter.</b> Damit rechnet man Volumen in Füllmengen um: Ein Aquarium mit
+30 dm³ fasst 30 Liter.</div>`,
+gens:[
+ {id:"volumen", label:"Volumen", make(){
+   const a = R(3,15), b = R(2,12), c = R(2,10);
+   return {q:`Ein Quader ist ${m(a+" cm")} lang, ${m(b+" cm")} breit und ${m(c+" cm")} hoch. Berechne das Volumen.`,
+     num:a*b*c, unit:"cm³", sol:`V = ${a} · ${b} · ${c} = <b>${a*b*c} cm³</b>`};
+ }},
+ {id:"oberflaeche", label:"Oberfläche", make(){
+   const a = R(3,12), b = R(2,10), c = R(2,9);
+   const o = 2*(a*b + a*c + b*c);
+   return {q:`Berechne die Oberfläche eines Quaders mit ${m(a+" cm")} × ${m(b+" cm")} × ${m(c+" cm")}.`,
+     num:o, unit:"cm²",
+     sol:`O = 2 · (${a}·${b} + ${a}·${c} + ${b}·${c}) = 2 · (${a*b} + ${a*c} + ${b*c}) = <b>${o} cm²</b>`};
+ }},
+ {id:"wuerfel", label:"Würfel", make(){
+   const a = R(2,12);
+   return {q:`Ein Würfel hat die Kantenlänge ${m(a+" cm")}. Berechne Volumen und Oberfläche.`,
+     fields:[{label:"Volumen", num:a**3, unit:"cm³"},{label:"Oberfläche", num:6*a*a, unit:"cm²"}],
+     sol:`V = ${a}³ = <b>${a**3} cm³</b> · O = 6 · ${a}² = <b>${6*a*a} cm²</b>`};
+ }},
+ {id:"liter", label:"Volumen in Liter", make(){
+   const a = R(3,9), b = R(2,8), c = R(2,7);
+   return {q:`Ein Becken misst ${m(a+" dm")} × ${m(b+" dm")} × ${m(c+" dm")}. Wie viele Liter passen hinein?`,
+     num:a*b*c, unit:"l",
+     sol:`V = ${a*b*c} dm³, und 1 dm³ = 1 l → <b>${a*b*c} Liter</b>`};
+ }}]});
+
+/* ---------------- KLASSE 6 ---------------- */
+
+T({id:"brueche1", kl:6, title:"Brüche verstehen", desc:"Kürzen, erweitern, vergleichen, gemischte Zahlen.",
+expl:`<p class="lead">Ein Bruch ist eine Teilung, die man stehen lässt: ${frac(3,4)} heißt „3 geteilt durch 4" — oder anschaulich:
+Eine Pizza in 4 Teile geteilt, davon 3 Stücke genommen.</p>
+<div class="rule"><b>Zähler</b> steht oben und zählt, wie viele Teile du hast.
+<b>Nenner</b> steht unten und benennt, in wie viele Teile das Ganze zerlegt wurde. Je größer der Nenner, desto kleiner die Stücke.</div>
+<h3>Erweitern und Kürzen</h3>
+<ol class="steps">
+<li><b>Erweitern</b>: Zähler <u>und</u> Nenner mit derselben Zahl malnehmen. Der Wert bleibt gleich, nur die Stücke werden kleiner: ${frac(3,4)} = ${frac(6,8)} = ${frac(9,12)}.</li>
+<li><b>Kürzen</b>: Zähler <u>und</u> Nenner durch dieselbe Zahl teilen. ${frac(18,24)} = ${frac(3,4)} (beide durch 6).</li>
+<li>Am schnellsten kürzt man mit dem <b>ggT</b> von Zähler und Nenner — dann ist man in einem Schritt fertig.</li>
+</ol>
+<div class="rule"><b>Merke:</b> Kürzen und Erweitern ändern den <b>Wert nicht</b>, nur die Schreibweise.
+Was man nie darf: nur oben oder nur unten rechnen. Und: „Aus Summen kürzen nur die Dummen."</div>
+<h3>Brüche vergleichen</h3>
+<p>Gleicher Nenner → der mit dem größeren Zähler ist größer. Sonst beide auf denselben Nenner bringen (kgV der Nenner)
+oder in Dezimalzahlen umwandeln.</p>
+<h3>Gemischte Zahlen</h3>
+<div class="ex">${frac(17,5)} → 17 : 5 = 3 Rest 2 → 3 ${frac(2,5)}<br>
+Zurück: 3 ${frac(2,5)} = (3 · 5 + 2) : 5 = ${frac(17,5)}</div>`,
+gens:[
+ {id:"kuerzen", label:"Kürzen", make(){
+   const [p,q] = [R(2,9), R(2,9)], f = R(2,9);
+   const a = p*f, b = (q+p)*f;
+   const [ra,rb] = red(a,b);
+   return {q:`Kürze so weit wie möglich: ${frac(a,b)}`, frac:[ra,rb], label:"Bruch (z. B. 3/4)",
+     sol:`ggT(${a}, ${b}) = ${gcd(a,b)} → beide durch ${gcd(a,b)} teilen: <b>${ra}/${rb}</b>`};
+ }},
+ {id:"erweitern", label:"Erweitern", make(){
+   const z = R(2,8), n = R(3,9), f = R(2,7);
+   return {q:`Erweitere ${frac(z,n)} auf den Nenner ${m(n*f)}. Wie lautet der neue Zähler?`, num:z*f,
+     sol:`${n} · ${f} = ${n*f}, also auch den Zähler mit ${f} malnehmen: ${z} · ${f} = <b>${z*f}</b>.`};
+ }},
+ {id:"vergleich", label:"Vergleichen", make(){
+   let a,b,c,d;
+   do { a = R(1,9); b = R(2,12); c = R(1,9); d = R(2,12); } while(Math.abs(a/b - c/d) < 1e-9);
+   const erste = a/b > c/d;
+   return {q:`Welcher Bruch ist größer: ${frac(a,b)} oder ${frac(c,d)}?`,
+     opts:[`${a}/${b}`, `${c}/${d}`], ai: erste?0:1,
+     sol:`Gleichnamig machen (Nenner ${lcm(b,d)}): ${a*lcm(b,d)/b}/${lcm(b,d)} und ${c*lcm(b,d)/d}/${lcm(b,d)}.
+       Als Dezimalzahl: ${fmt(a/b,3)} und ${fmt(c/d,3)}.`};
+ }},
+ {id:"gemischt", label:"Gemischte Zahlen", make(){
+   const n = R(3,9), g = R(2,6), r = R(1,n-1), z = g*n + r;
+   if(Math.random() < .5)
+     return {q:`Wandle ${frac(z,n)} in eine gemischte Zahl um.`,
+       fields:[{label:"ganze Zahl", num:g},{label:"Zähler des Rests", num:r}],
+       sol:`${z} : ${n} = ${g} Rest ${r} → <b>${g} ${r}/${n}</b>`};
+   return {q:`Schreibe ${m(g+" "+r+"/"+n)} als unechten Bruch. Wie lautet der Zähler?`, num:z,
+     sol:`${g} · ${n} + ${r} = <b>${z}</b>, also ${z}/${n}.`};
+ }}]});
+
+T({id:"brueche2", kl:6, title:"Bruchrechnen", desc:"Addieren, subtrahieren, malnehmen, teilen.",
+expl:`<p class="lead">Jede Rechenart hat bei Brüchen ihre eigene Regel. Die gute Nachricht: Mal und Geteilt sind einfacher als Plus und Minus.</p>
+<h3>Addieren und Subtrahieren</h3>
+<ol class="steps">
+<li><b>Gleichnamig machen</b>: gemeinsamen Nenner suchen (kgV der Nenner).</li>
+<li>Beide Brüche darauf erweitern.</li>
+<li>Nur die <b>Zähler</b> addieren, der Nenner bleibt stehen.</li>
+<li>Ergebnis kürzen.</li>
+</ol>
+<div class="ex">${frac(2,3)} + ${frac(1,4)} = ${frac(8,12)} + ${frac(3,12)} = ${frac(11,12)}</div>
+<div class="rule"><b>Der Klassiker unter den Fehlern:</b> Nenner addieren.
+${frac(1,2)} + ${frac(1,3)} ist <u>nicht</u> ${frac(2,5)} — sonst wäre die Summe kleiner als ein einzelner Summand.</div>
+<h3>Multiplizieren</h3>
+<div class="ex">Zähler mal Zähler, Nenner mal Nenner: ${frac(2,3)} · ${frac(4,5)} = ${frac(8,15)}<br>
+Tipp: <b>vorher kürzen</b> — über Kreuz — spart große Zahlen.</div>
+<h3>Dividieren</h3>
+<div class="rule">Durch einen Bruch teilen = mit dem <b>Kehrbruch</b> malnehmen:
+${frac(2,3)} : ${frac(4,5)} = ${frac(2,3)} · ${frac(5,4)} = ${frac(10,12)} = ${frac(5,6)}<br>
+Der Kehrbruch entsteht durch Umdrehen von Zähler und Nenner.</div>
+<h3>Bruchteil einer Größe</h3>
+<p>„${frac(3,4)} von 60" heißt ${frac(3,4)} · 60 = 45. Rechenweg: durch den Nenner teilen, mit dem Zähler malnehmen.</p>`,
+gens:[
+ {id:"addsub", label:"Plus & Minus", make(){
+   const b = R(2,9), d = R(2,9), a = R(1,b-1)||1, c = R(1,d-1)||1;
+   const plus = Math.random() < .5;
+   const n = lcm(b,d);
+   const z = plus ? a*(n/b) + c*(n/d) : a*(n/b) - c*(n/d);
+   const [rz,rn] = red(z,n);
+   return {q:`Berechne und kürze: ${frac(a,b)} ${plus?"+":"−"} ${frac(c,d)}`, frac:[rz,rn], label:"Bruch (z. B. 3/4)",
+     sol:`Hauptnenner ${n}: ${a*(n/b)}/${n} ${plus?"+":"−"} ${c*(n/d)}/${n} = ${z}/${n} = <b>${rz}/${rn}</b>`};
+ }},
+ {id:"mal", label:"Malnehmen", make(){
+   const a = R(1,8), b = R(2,9), c = R(1,8), d = R(2,9);
+   const [rz,rn] = red(a*c, b*d);
+   return {q:`Berechne und kürze: ${frac(a,b)} · ${frac(c,d)}`, frac:[rz,rn], label:"Bruch",
+     sol:`Zähler · Zähler, Nenner · Nenner: ${a*c}/${b*d} = <b>${rz}/${rn}</b>`};
+ }},
+ {id:"geteilt", label:"Teilen", make(){
+   const a = R(1,8), b = R(2,9), c = R(1,8), d = R(2,9);
+   const [rz,rn] = red(a*d, b*c);
+   return {q:`Berechne und kürze: ${frac(a,b)} : ${frac(c,d)}`, frac:[rz,rn], label:"Bruch",
+     sol:`Mit dem Kehrbruch malnehmen: ${frac(a,b)} · ${frac(d,c)} = ${a*d}/${b*c} = <b>${rz}/${rn}</b>`};
+ }},
+ {id:"von", label:"Bruchteil einer Größe", make(){
+   const n = pick([2,3,4,5,6,8]), z = R(1,n-1), g = n * R(4,25);
+   return {q:`Wie viel sind ${frac(z,n)} von ${m(g)}?`, num:g*z/n,
+     sol:`${g} : ${n} = ${g/n}, mal ${z} → <b>${g*z/n}</b>`};
+ }}]});
+
+T({id:"dezimal", kl:6, title:"Dezimalzahlen", desc:"Umwandeln, rechnen, mit Stufenzahlen multiplizieren.",
+expl:`<p class="lead">Eine Dezimalzahl ist nur eine andere Schreibweise für einen Bruch mit dem Nenner 10, 100, 1000 …</p>
+<div class="ex">0,7 = ${frac(7,10)}   ·   0,25 = ${frac(25,100)} = ${frac(1,4)}   ·   3,125 = 3 ${frac(125,1000)} = 3 ${frac(1,8)}</div>
+<h3>Bruch → Dezimalzahl</h3>
+<p>Zähler durch Nenner teilen: ${frac(3,8)} = 3 : 8 = 0,375. Manche Brüche ergeben eine periodische Zahl:
+${frac(1,3)} = 0,333… = 0,<span style="text-decoration:overline">3</span>.</p>
+<h3>Rechnen</h3>
+<ol class="steps">
+<li><b>Plus und Minus:</b> Kommas <u>untereinander</u> schreiben, notfalls mit Nullen auffüllen.</li>
+<li><b>Mal:</b> ohne Komma rechnen, danach so viele Nachkommastellen abzählen, wie beide Faktoren zusammen haben.
+2,5 · 0,4: 25 · 4 = 100, zwei Nachkommastellen → 1,00.</li>
+<li><b>Geteilt:</b> beide Zahlen so lange mal 10 nehmen, bis der Divisor eine ganze Zahl ist.</li>
+</ol>
+<h3>Mal 10, 100, 1000</h3>
+<div class="rule">Das Komma wandert — <b>mal</b> nach rechts, <b>geteilt</b> nach links, um so viele Stellen wie die Zahl Nullen hat.
+3,47 · 100 = 347   ·   3,47 : 10 = 0,347</div>`,
+gens:[
+ {id:"umwandeln", label:"Umwandeln", make(){
+   const p = pick([[1,2],[1,4],[3,4],[1,5],[2,5],[1,8],[3,8],[5,8],[1,10],[7,10],[1,20],[3,25]]);
+   return {q:`Schreibe ${frac(p[0],p[1])} als Dezimalzahl.`, num:p[0]/p[1], dec:4,
+     sol:`${p[0]} : ${p[1]} = <b>${fmt(p[0]/p[1])}</b>`};
+ }},
+ {id:"stufen", label:"Mal 10, 100, 1000", make(){
+   const v = round(R(105, 9985)/100, 2), s = pick([10,100,1000]), mal = Math.random() < .5;
+   return {q:`Berechne ${m(fmt(v) + (mal?" · ":" : ") + s)}`, num: mal ? v*s : v/s, dec:5,
+     sol:`Das Komma wandert um ${String(s).length-1} Stellen nach ${mal?"rechts":"links"} → <b>${fmt(mal?v*s:v/s)}</b>`};
+ }},
+ {id:"rechnen", label:"Plus & Minus", make(){
+   const a = round(R(150,9990)/100,2), b = round(R(120,8900)/100,2);
+   const plus = Math.random() < .5, big = Math.max(a,b), sm = Math.min(a,b);
+   return plus
+     ? {q:`Berechne ${m(fmt(a)+" + "+fmt(b))}`, num:round(a+b,2), dec:2, sol:`Kommas untereinander → <b>${fmt(a+b,2)}</b>`}
+     : {q:`Berechne ${m(fmt(big)+" − "+fmt(sm))}`, num:round(big-sm,2), dec:2, sol:`Kommas untereinander → <b>${fmt(big-sm,2)}</b>`};
+ }},
+ {id:"malzahl", label:"Malnehmen", make(){
+   const a = round(R(11,99)/10,1), b = round(R(11,99)/10,1);
+   return {q:`Berechne ${m(fmt(a)+" · "+fmt(b))}`, num:round(a*b,2), dec:2,
+     sol:`Ohne Komma: ${a*10} · ${b*10} = ${a*10*b*10}. Zusammen 2 Nachkommastellen → <b>${fmt(round(a*b,2),2)}</b>`};
+ }}]});
+
+T({id:"prozent1", kl:6, title:"Prozente: Grundlagen", desc:"Anteile als Prozent, Prozentwerte berechnen.",
+expl:`<p class="lead">Prozent heißt „von hundert". 25 % ist nichts anderes als ${frac(25,100)} = ${frac(1,4)} = 0,25.</p>
+<h3>Die drei Schreibweisen</h3>
+<table class="tbl">
+<tr><th>Prozent</th><th>Bruch</th><th>Dezimalzahl</th></tr>
+<tr><td class="f">10 %</td><td class="f">1/10</td><td class="f">0,1</td></tr>
+<tr><td class="f">25 %</td><td class="f">1/4</td><td class="f">0,25</td></tr>
+<tr><td class="f">50 %</td><td class="f">1/2</td><td class="f">0,5</td></tr>
+<tr><td class="f">75 %</td><td class="f">3/4</td><td class="f">0,75</td></tr>
+<tr><td class="f">20 %</td><td class="f">1/5</td><td class="f">0,2</td></tr>
+</table>
+<div class="rule">Von Prozent zur Dezimalzahl: <b>geteilt durch 100</b> (Komma zwei Stellen nach links).
+Zurück: <b>mal 100</b>.</div>
+<h3>Prozentwert berechnen</h3>
+<ol class="steps">
+<li>Prozentsatz in eine Dezimalzahl verwandeln: 18 % → 0,18.</li>
+<li>Mit dem Grundwert malnehmen: 0,18 · 250 = 45.</li>
+</ol>
+<h3>Anteil als Prozent</h3>
+<div class="ex">12 von 48: 12 : 48 = 0,25 → mal 100 → <b>25 %</b></div>
+<div class="rule"><b>Im Kopf:</b> 10 % bekommst du, indem du durch 10 teilst; 1 % durch 100.
+Alles andere setzt du daraus zusammen: 30 % = dreimal 10 %, 5 % = die Hälfte von 10 %.</div>`,
+gens:[
+ {id:"pwert", label:"Prozentwert", make(){
+   const p = pick([5,10,12,15,20,25,30,40,60,75]), g = R(2,40)*20;
+   return {q:`Berechne ${m(p+" %")} von ${m(g)}.`, num:g*p/100, dec:2,
+     sol:`${p} % = ${fmt(p/100)} → ${fmt(p/100)} · ${g} = <b>${fmt(g*p/100)}</b>`};
+ }},
+ {id:"anteil", label:"Anteil in Prozent", make(){
+   const g = pick([20,25,40,50,80,200,250,400]), t = R(1,g-1);
+   const p = round(t/g*100, 2);
+   return {q:`Wie viel Prozent sind ${m(t)} von ${m(g)}?`, num:p, unit:"%", dec:2,
+     sol:`${t} : ${g} = ${fmt(t/g,4)} → mal 100 → <b>${fmt(p)} %</b>`};
+ }},
+ {id:"umform", label:"Umwandeln", make(){
+   const p = pick([[10,1,10],[20,1,5],[25,1,4],[50,1,2],[75,3,4],[40,2,5],[60,3,5],[80,4,5],[5,1,20]]);
+   if(Math.random() < .5)
+     return {q:`Schreibe ${m(p[0]+" %")} als Dezimalzahl.`, num:p[0]/100, dec:4,
+       sol:`${p[0]} : 100 = <b>${fmt(p[0]/100)}</b>`};
+   return {q:`Wie viel Prozent sind ${frac(p[1],p[2])}?`, num:p[0], unit:"%",
+     sol:`${p[1]} : ${p[2]} = ${fmt(p[1]/p[2])} → <b>${p[0]} %</b>`};
+ }},
+ {id:"kopf", label:"Im Kopf", make(){
+   const g = R(2,90)*10, p = pick([1,10,5,20,50]);
+   return {q:`${m(p+" %")} von ${m(g)} — im Kopf.`, num:g*p/100, dec:2,
+     sol: p===10 ? `10 % = durch 10 teilen → <b>${fmt(g/10)}</b>`
+        : p===1  ? `1 % = durch 100 teilen → <b>${fmt(g/100)}</b>`
+        : p===50 ? `50 % = die Hälfte → <b>${fmt(g/2)}</b>`
+        : p===5  ? `5 % = die Hälfte von 10 % (${fmt(g/10)}) → <b>${fmt(g/20)}</b>`
+                 : `20 % = zweimal 10 % (${fmt(g/10)}) → <b>${fmt(g/5)}</b>`};
+ }}]});
+
+T({id:"winkel", kl:6, title:"Winkel", desc:"Winkelarten, Neben- und Scheitelwinkel, Winkelsumme.",
+expl:`<p class="lead">Ein Winkel misst eine Drehung. Eine volle Drehung sind 360°, eine halbe 180°, eine viertel 90°.</p>
+<h3>Winkelarten</h3>
+<table class="tbl">
+<tr><td class="f">spitz</td><td>kleiner als 90°</td><td class="f">recht</td><td>genau 90°</td></tr>
+<tr><td class="f">stumpf</td><td>zwischen 90° und 180°</td><td class="f">gestreckt</td><td>genau 180°</td></tr>
+<tr><td class="f">überstumpf</td><td>zwischen 180° und 360°</td><td class="f">voll</td><td>genau 360°</td></tr>
+</table>
+<h3>Winkel an sich schneidenden Geraden</h3>
+<ol class="steps">
+<li><b>Nebenwinkel</b> liegen nebeneinander und ergänzen sich zu 180°: α + β = 180°.</li>
+<li><b>Scheitelwinkel</b> liegen sich gegenüber und sind <b>gleich groß</b>.</li>
+<li>An parallelen Geraden gilt zusätzlich: <b>Stufenwinkel</b> sind gleich groß, <b>Wechselwinkel</b> ebenfalls.</li>
+</ol>
+<h3>Winkelsummen</h3>
+<div class="rule">Im <b>Dreieck</b>: α + β + γ = 180°. Im <b>Viereck</b>: 360°.
+Damit lässt sich immer der dritte (bzw. vierte) Winkel ausrechnen, wenn die anderen bekannt sind.</div>
+<h3>Winkel im Kreisdiagramm</h3>
+<div class="ex">Anteil in Prozent · 3,6 = Winkel. 25 % → 25 · 3,6 = 90°<br>
+Denn 100 % entsprechen 360°, also 1 % genau 3,6°.</div>`,
+gens:[
+ {id:"art", label:"Winkelarten", make(){
+   const a = R(5,355);
+   const art = a < 90 ? "spitz" : a === 90 ? "recht" : a < 180 ? "stumpf" : a === 180 ? "gestreckt" : "überstumpf";
+   return {q:`Welche Winkelart hat ${m(a+"°")}?`, opts:["spitz","recht","stumpf","überstumpf"],
+     ai:["spitz","recht","stumpf","überstumpf"].indexOf(art === "gestreckt" ? "stumpf" : art),
+     sol:`${a}° ist ${art}.`};
+ }},
+ {id:"neben", label:"Neben- & Scheitelwinkel", make(){
+   const a = R(15,165);
+   if(Math.random() < .5)
+     return {q:`Zwei Geraden schneiden sich. Ein Winkel misst ${m(a+"°")}. Wie groß ist sein Nebenwinkel?`,
+       num:180-a, unit:"°", sol:`Nebenwinkel ergänzen sich zu 180°: 180° − ${a}° = <b>${180-a}°</b>`};
+   return {q:`Ein Winkel misst ${m(a+"°")}. Wie groß ist sein Scheitelwinkel?`, num:a, unit:"°",
+     sol:`Scheitelwinkel sind gleich groß → <b>${a}°</b>`};
+ }},
+ {id:"summe", label:"Winkelsumme", make(){
+   if(Math.random() < .5){
+     const a = R(25,90), b = R(25,180-a-20);
+     return {q:`In einem Dreieck sind α = ${m(a+"°")} und β = ${m(b+"°")}. Wie groß ist γ?`,
+       num:180-a-b, unit:"°", sol:`γ = 180° − ${a}° − ${b}° = <b>${180-a-b}°</b>`};
+   }
+   const a = R(50,120), b = R(50,120), c = R(50, 360-a-b-40);
+   return {q:`In einem Viereck sind drei Winkel ${m(a+"°")}, ${m(b+"°")} und ${m(c+"°")}. Wie groß ist der vierte?`,
+     num:360-a-b-c, unit:"°", sol:`Winkelsumme im Viereck ist 360°: 360° − ${a}° − ${b}° − ${c}° = <b>${360-a-b-c}°</b>`};
+ }},
+ {id:"kreis", label:"Kreisdiagramm", make(){
+   const p = pick([5,10,12,15,20,25,30,40,45,60,75]);
+   return {q:`In einem Kreisdiagramm sollen ${m(p+" %")} dargestellt werden. Wie groß ist der Winkel?`,
+     num:p*3.6, unit:"°", dec:1, sol:`1 % = 3,6° → ${p} · 3,6 = <b>${fmt(p*3.6)}°</b>`};
+ }}]});
+
+T({id:"daten", kl:6, title:"Daten & Diagramme", desc:"Mittelwert, Median, Spannweite, Häufigkeiten.",
+expl:`<p class="lead">Drei Zahlen beschreiben eine Datenreihe: wo die Mitte liegt (zwei Arten) und wie weit sie gestreut ist.</p>
+<h3>Arithmetisches Mittel (Durchschnitt)</h3>
+<div class="ex">Alle Werte addieren, durch die Anzahl teilen.<br>
+2, 5, 5, 8, 10 → (2+5+5+8+10) : 5 = 30 : 5 = <b>6</b></div>
+<h3>Median (Zentralwert)</h3>
+<ol class="steps">
+<li>Werte der Größe nach <b>sortieren</b> — dieser Schritt wird am häufigsten vergessen.</li>
+<li>Ungerade Anzahl → der mittlere Wert. Bei 2, 5, <b>5</b>, 8, 10 ist der Median 5.</li>
+<li>Gerade Anzahl → Durchschnitt der beiden mittleren Werte.</li>
+</ol>
+<div class="rule"><b>Warum zwei Mittelwerte?</b> Ein einzelner Ausreißer zieht den Durchschnitt stark mit,
+den Median kaum. Bei den Werten 1, 2, 2, 3, 100 ist der Durchschnitt 21,6 — der Median 2 beschreibt die Gruppe besser.</div>
+<h3>Spannweite</h3>
+<p>Größter Wert minus kleinster Wert. Sie zeigt, wie weit die Daten auseinanderliegen.</p>
+<h3>Häufigkeiten</h3>
+<div class="rule"><b>Absolute Häufigkeit</b> = Anzahl. <b>Relative Häufigkeit</b> = Anzahl : Gesamtzahl,
+oft in Prozent angegeben.</div>`,
+gens:[
+ {id:"mittel", label:"Mittelwert", make(){
+   const n = R(4,6), v = Array.from({length:n}, () => R(2,40));
+   const s = v.reduce((x,y)=>x+y,0);
+   return {q:`Berechne den Mittelwert von ${m(v.join("; "))}`, num:s/n, dec:2,
+     sol:`Summe = ${s}, geteilt durch ${n} → <b>${fmt(s/n,2)}</b>`};
+ }},
+ {id:"median", label:"Median", make(){
+   const n = pick([5,6,7]), v = Array.from({length:n}, () => R(1,30));
+   const s = [...v].sort((a,b)=>a-b);
+   const med = n%2 ? s[(n-1)/2] : (s[n/2-1] + s[n/2])/2;
+   return {q:`Bestimme den Median von ${m(v.join("; "))}`, num:med, dec:2,
+     sol:`Sortiert: ${s.join("; ")} → Median <b>${fmt(med)}</b>`};
+ }},
+ {id:"spann", label:"Spannweite", make(){
+   const v = Array.from({length:R(5,7)}, () => R(3,60));
+   return {q:`Wie groß ist die Spannweite von ${m(v.join("; "))}?`, num:Math.max(...v)-Math.min(...v),
+     sol:`${Math.max(...v)} − ${Math.min(...v)} = <b>${Math.max(...v)-Math.min(...v)}</b>`};
+ }},
+ {id:"relativ", label:"Relative Häufigkeit", make(){
+   const g = pick([20,25,40,50,200]), t = R(1,g-1);
+   return {q:`Von ${m(g)} befragten Personen antworten ${m(t)} mit Ja. Wie hoch ist die relative Häufigkeit in Prozent?`,
+     num:round(t/g*100,2), unit:"%", dec:2,
+     sol:`${t} : ${g} = ${fmt(t/g,4)} → <b>${fmt(round(t/g*100,2))} %</b>`};
+ }}]});
+</script>
+<script>
+/* ---------------- KLASSE 7 ---------------- */
+
+T({id:"rational", kl:7, title:"Rationale Zahlen", desc:"Rechnen mit negativen Zahlen.",
+expl:`<p class="lead">Negative Zahlen liegen links von der Null. Damit wird die Zahlengerade nach beiden Seiten unendlich — und Subtrahieren ist immer möglich.</p>
+<h3>Addieren und Subtrahieren</h3>
+<ol class="steps">
+<li>Denk an die Zahlengerade: <b>plus</b> heißt nach rechts, <b>minus</b> nach links.</li>
+<li>Zwei Zeichen direkt hintereinander werden zu einem: <b>+(−) → −</b> und <b>−(−) → +</b>.</li>
+<li>Gleiche Vorzeichen: Beträge addieren, Vorzeichen behalten. Verschiedene: Beträge subtrahieren, Vorzeichen der größeren Zahl.</li>
+</ol>
+<div class="ex">−7 + 3 = −4   ·   −7 − 3 = −10   ·   5 − (−4) = 5 + 4 = 9   ·   −6 + (−2) = −8</div>
+<h3>Multiplizieren und Dividieren</h3>
+<div class="rule"><b>Gleiche Vorzeichen → plus. Verschiedene Vorzeichen → minus.</b><br>
+(−5) · (−4) = +20   ·   (−5) · 4 = −20   ·   (−20) : (−4) = 5   ·   20 : (−4) = −5<br>
+Bei mehreren Faktoren: Zähle die Minuszeichen. Gerade Anzahl → Ergebnis positiv, ungerade → negativ.</div>
+<h3>Betrag</h3>
+<p>Der Betrag |−7| = 7 ist der Abstand von der Null — immer positiv.</p>`,
+gens:[
+ {id:"addsub", label:"Plus & Minus", make(){
+   const a = Rn(-30,30), b = Rn(-30,30), plus = Math.random() < .5;
+   const v = plus ? a+b : a-b;
+   return {q:`Berechne ${m(`${a} ${plus?"+":"−"} (${b})`)}`, num:v,
+     sol: plus ? `${a} + (${b}) = ${a} ${pmt(b)} = <b>${v}</b>`
+               : `${a} − (${b}) = ${a} ${b<0?"+ "+Math.abs(b):"− "+b} = <b>${v}</b>`};
+ }},
+ {id:"malgeteilt", label:"Mal & Geteilt", make(){
+   const a = Rn(-12,12), b = Rn(-12,12);
+   if(Math.random() < .5)
+     return {q:`Berechne ${m(`(${a}) · (${b})`)}`, num:a*b,
+       sol:`${a*b>0?"Gleiche":"Verschiedene"} Vorzeichen → Ergebnis ${a*b>0?"positiv":"negativ"}: <b>${a*b}</b>`};
+   const p = a*b;
+   return {q:`Berechne ${m(`(${p}) : (${a})`)}`, num:b,
+     sol:`${p/a>0?"Gleiche":"Verschiedene"} Vorzeichen → <b>${b}</b>`};
+ }},
+ {id:"kette", label:"Rechenketten", make(){
+   const a = Rn(-15,15), b = Rn(-9,9), c = Rn(-9,9);
+   const v = a - b*c;
+   return {q:`Berechne ${m(`${a} − (${b}) · (${c})`)}`, num:v,
+     sol:`Punkt vor Strich: (${b}) · (${c}) = ${b*c}. Dann ${a} − (${b*c}) = <b>${v}</b>`};
+ }},
+ {id:"betrag", label:"Betrag & Vergleich", make(){
+   const a = Rn(-40,40), b = Rn(-40,40);
+   if(Math.random() < .5)
+     return {q:`Berechne ${m(`|${a}| + |${b}|`)}`, num:Math.abs(a)+Math.abs(b),
+       sol:`|${a}| = ${Math.abs(a)}, |${b}| = ${Math.abs(b)} → <b>${Math.abs(a)+Math.abs(b)}</b>`};
+   return {q:`Welche Zahl ist größer: ${m(a)} oder ${m(b)}?`, opts:[String(a),String(b)], ai: a>b?0:1,
+     sol:`Auf der Zahlengeraden liegt ${Math.max(a,b)} weiter rechts → <b>${Math.max(a,b)}</b> ist größer.`};
+ }}]});
+
+T({id:"terme", kl:7, title:"Terme & Variablen", desc:"Zusammenfassen, ausmultiplizieren, einsetzen.",
+expl:`<p class="lead">Ein Term ist ein Rechenausdruck mit Platzhaltern. Er hat kein Ergebnis, solange man für die Variable nichts einsetzt.</p>
+<h3>Gleichartige Glieder zusammenfassen</h3>
+<div class="rule">Nur was <b>dieselbe Variable in derselben Potenz</b> hat, darf zusammengefasst werden.
+3x und 5x gehen (= 8x), 3x und 5x² nicht, 3x und 5 auch nicht.<br>
+Denk an Obst: 3 Äpfel + 5 Äpfel = 8 Äpfel, aber 3 Äpfel + 5 Birnen bleibt stehen.</div>
+<div class="ex">3x + 5 + 4x − 2 = (3x + 4x) + (5 − 2) = <b>7x + 3</b></div>
+<h3>Klammern auflösen</h3>
+<ol class="steps">
+<li><b>Plus vor der Klammer:</b> Klammer weglassen, alles bleibt. a + (b − c) = a + b − c</li>
+<li><b>Minus vor der Klammer:</b> <u>alle</u> Vorzeichen drinnen umdrehen. a − (b − c) = a − b + c</li>
+<li><b>Zahl vor der Klammer:</b> jeden Summanden einzeln malnehmen. 3(2x + 5) = 6x + 15</li>
+</ol>
+<div class="rule"><b>Der häufigste Fehler:</b> Bei −(2x + 5) nur das erste Vorzeichen ändern.
+Richtig ist −2x − 5.</div>
+<h3>Einsetzen</h3>
+<p>Für x = −3 in 4x + 7: erst die Klammern setzen, dann rechnen: 4 · (−3) + 7 = −12 + 7 = −5.</p>`,
+gens:[
+ {id:"zusammen", label:"Zusammenfassen", make(){
+   const a = R(2,9), b = R(2,9), c = Rn(-9,9), d = Rn(-9,9);
+   const kx = a+b, kz = c+d;
+   const t = `${kx}x${kz===0?"":sgn(kz)}`.replace("−"," − ").replace("+"," + ");
+   return {q:`Fasse zusammen: ${m(`${a}x ${pmt(c)} + ${b}x ${pmt(d)}`)}`,
+     a:[`${kx}x${kz>=0?"+"+kz:kz}`, `${kz>=0?kz+"+":kz+""}${kx}x`, kz===0?`${kx}x`:""].filter(Boolean),
+     label:"Term (z. B. 7x+3)",
+     sol:`x-Glieder: ${a}x + ${b}x = ${kx}x. Zahlen: ${c}${pmt(d)} = ${kz}. → <b>${kx}x${kz===0?"":(kz>0?" + "+kz:" − "+Math.abs(kz))}</b>`};
+ }},
+ {id:"klammer", label:"Klammern auflösen", make(){
+   const f = R(2,7), a = R(2,9), b = Rn(-9,9);
+   const kx = f*a, kz = f*b;
+   return {q:`Multipliziere aus: ${m(`${f} · (${a}x ${pmt(b)})`)}`,
+     a:[`${kx}x${kz>=0?"+"+kz:kz}`, `${kz>=0?kz+"+":kz}${kx}x`], label:"Term",
+     sol:`Jeden Summanden mal ${f}: ${f}·${a}x = ${kx}x und ${f}·(${b}) = ${kz} → <b>${kx}x ${pmt(kz)}</b>`};
+ }},
+ {id:"minusklammer", label:"Minus vor der Klammer", make(){
+   const a = R(2,9), b = Rn(-9,9), c = R(2,9);
+   const kx = c-a, kz = -b;
+   return {q:`Vereinfache: ${m(`${c}x − (${a}x ${pmt(b)})`)}`,
+     a:[`${kx}x${kz>=0?"+"+kz:kz}`, `${kz>=0?kz+"+":kz}${kx}x`, kz===0?`${kx}x`:""].filter(Boolean), label:"Term",
+     sol:`Minus dreht alle Vorzeichen: ${c}x − ${a}x ${(-b)<0?"− "+Math.abs(b):"+ "+Math.abs(b)} → <b>${kx}x ${pmt(kz)}</b>`};
+ }},
+ {id:"einsetzen", label:"Einsetzen", make(){
+   const a = Rn(-8,8), b = Rn(-15,15), x = Rn(-7,7);
+   return {q:`Berechne den Wert von ${m(`${a}x ${pmt(b)}`)} für ${m("x = "+x)}.`,
+     num:a*x+b, sol:`${a} · (${x}) ${pmt(b)} = ${a*x} ${pmt(b)} = <b>${a*x+b}</b>`};
+ }},
+ {id:"aufstellen", label:"Terme aufstellen", make(){
+   const a = R(2,9), b = R(2,20);
+   const arten = [
+     {t:`Das ${a}-fache einer Zahl x, vermindert um ${b}`, a:[`${a}x-${b}`], s:`${a}x − ${b}`},
+     {t:`Die Summe aus einer Zahl x und ${b}, mal ${a} genommen`, a:[`${a}(x+${b})`,`${a}x+${a*b}`], s:`${a} · (x + ${b}) = ${a}x + ${a*b}`},
+     {t:`Eine Zahl x, um ${b} vergrößert und dann verdoppelt`, a:[`2(x+${b})`,`2x+${2*b}`], s:`2 · (x + ${b}) = 2x + ${2*b}`}];
+   const k = pick(arten);
+   return {q:`Stelle einen Term auf: ${k.t}.`, a:k.a, label:"Term",
+     sol:`<b>${k.s}</b>`, hint:"Klammern mit ( ) schreiben"};
+ }}]});
+
+T({id:"gleichungen", kl:7, title:"Gleichungen lösen", desc:"Äquivalenzumformungen bis zur Lösung.",
+expl:`<p class="lead">Eine Gleichung ist eine Waage. Was du links tust, musst du rechts genauso tun — dann bleibt sie im Gleichgewicht.</p>
+<h3>Das Ziel</h3>
+<p>Am Ende soll dastehen: <b>x = Zahl</b>. Dafür bringt man alle x auf eine Seite und alle Zahlen auf die andere.</p>
+<ol class="steps">
+<li><b>Klammern auflösen</b> und auf jeder Seite zusammenfassen.</li>
+<li><b>x-Glieder</b> auf eine Seite bringen (dieselbe Zahl auf beiden Seiten addieren oder subtrahieren).</li>
+<li><b>Zahlen</b> auf die andere Seite bringen.</li>
+<li>Durch die Zahl vor dem x <b>teilen</b>.</li>
+<li><b>Probe:</b> Lösung in die ursprüngliche Gleichung einsetzen.</li>
+</ol>
+<div class="ex">5x + 7 = 3x − 5   | −3x<br>2x + 7 = −5   | −7<br>2x = −12   | :2<br>x = <b>−6</b><br>
+Probe: 5·(−6)+7 = −23 und 3·(−6)−5 = −23 ✓</div>
+<div class="rule"><b>Immer beide Seiten.</b> Der häufigste Fehler ist, nur links zu rechnen.
+Schreib die Umformung mit senkrechtem Strich dahinter — dann vergisst du es nicht.</div>
+<h3>Sonderfälle</h3>
+<div class="rule">Kommt am Ende <b>0 = 0</b> heraus, ist jede Zahl eine Lösung. Kommt etwas Falsches wie
+<b>0 = 5</b> heraus, gibt es keine Lösung.</div>`,
+gens:[
+ {id:"einfach", label:"Einfache Gleichungen", make(){
+   const a = R(2,9), x = Rn(-12,12), b = Rn(-20,20);
+   return {q:`Löse: ${m(`${a}x ${pmt(b)} = ${a*x+b}`)}`, num:x, label:"x",
+     sol:`${a}x = ${a*x+b} ${b<0?"+ "+Math.abs(b):"− "+b} = ${a*x} | :${a} → x = <b>${x}</b>`};
+ }},
+ {id:"beidseitig", label:"x auf beiden Seiten", make(){
+   const a = R(3,9), c = R(1,a-1), x = Rn(-10,10), b = Rn(-15,15);
+   const d = (a-c)*x + b;
+   return {q:`Löse: ${m(`${a}x ${pmt(b)} = ${c}x${pmt(d)}`)}`, num:x, label:"x",
+     sol:`| −${c}x → ${a-c}x ${pmt(b)} = ${d} | ${b<0?"+ "+Math.abs(b):"− "+b} → ${a-c}x = ${(a-c)*x} | :${a-c} → x = <b>${x}</b>`};
+ }},
+ {id:"klammer", label:"Mit Klammern", make(){
+   const f = R(2,6), a = R(2,6), x = Rn(-9,9), b = Rn(-9,9);
+   const r = f*(a*x + b);
+   return {q:`Löse: ${m(`${f} · (${a}x ${pmt(b)}) = ${r}`)}`, num:x, label:"x",
+     sol:`Ausmultiplizieren: ${f*a}x ${pmt(f*b)} = ${r} → ${f*a}x = ${f*a*x} | :${f*a} → x = <b>${x}</b>`};
+ }},
+ {id:"sach", label:"Sachaufgaben", make(){
+   const a = R(2,6), b = R(5,40), x = R(3,25);
+   return {q:`Denke dir eine Zahl. Nimm sie mal ${m(a)} und addiere ${m(b)}. Das Ergebnis ist ${m(a*x+b)}. Wie lautet die Zahl?`,
+     num:x, label:"x",
+     sol:`${a}x + ${b} = ${a*x+b} | −${b} → ${a}x = ${a*x} | :${a} → x = <b>${x}</b>`};
+ }}]});
+
+T({id:"prozent2", kl:7, title:"Prozentrechnung", desc:"Grundwert, Prozentwert, Prozentsatz, Zu- und Abnahme.",
+expl:`<p class="lead">Drei Größen, drei Fragen — und immer dieselbe Formel, nur nach einer anderen Größe umgestellt.</p>
+<h3>Die drei Größen</h3>
+<table class="tbl">
+<tr><td class="f">Grundwert G</td><td>das Ganze, die 100 %</td></tr>
+<tr><td class="f">Prozentwert W</td><td>der Anteil davon</td></tr>
+<tr><td class="f">Prozentsatz p</td><td>wie viel Prozent, z. B. 18 %</td></tr>
+</table>
+<div class="ex">W = G · p   ·   G = W : p   ·   p = W : G<br>(p immer als Dezimalzahl: 18 % = 0,18)</div>
+<h3>Welche Größe ist gesucht?</h3>
+<ol class="steps">
+<li>Suche das Wort <b>„von"</b> — was danach steht, ist der Grundwert.</li>
+<li>Steht die Prozentzahl in der Aufgabe? Dann ist entweder G oder W gesucht.</li>
+<li>Fehlt die Prozentzahl? Dann ist p gesucht: p = W : G, danach mal 100.</li>
+</ol>
+<h3>Zunahme und Abnahme</h3>
+<div class="rule">Statt zwei Schritten geht es in einem — mit dem <b>Faktor</b>:<br>
+Preis + 20 % → mal <b>1,20</b> · Preis − 15 % → mal <b>0,85</b><br>
+Rückwärts (der neue Preis ist bekannt, gesucht ist der alte): <b>teilen</b> statt malnehmen.</div>
+<div class="rule"><b>Die klassische Falle:</b> Ein Preis steigt um 20 % und fällt dann um 20 % — man ist <u>nicht</u>
+wieder beim Ausgangswert. 100 → 120 → 96, denn die zweiten 20 % beziehen sich auf einen anderen Grundwert.</div>`,
+gens:[
+ {id:"grundwert", label:"Grundwert gesucht", make(){
+   const p = pick([4,5,8,10,12,15,20,25,30,40]), g = R(4,60)*25;
+   const w = g*p/100;
+   return {q:`${m(fmt(w)+" €")} sind ${m(p+" %")} eines Betrags. Wie hoch ist der Grundwert?`,
+     num:g, unit:"€", dec:2,
+     sol:`G = W : p = ${fmt(w)} : ${fmt(p/100)} = <b>${eur(g)}</b>`};
+ }},
+ {id:"prozentsatz", label:"Prozentsatz gesucht", make(){
+   const g = pick([40,50,80,120,200,250,400,500]), w = R(1,g-1);
+   return {q:`Von ${m(g+" €")} werden ${m(fmt(w)+" €")} gespart. Wie viel Prozent sind das?`,
+     num:round(w/g*100,2), unit:"%", dec:2,
+     sol:`p = W : G = ${w} : ${g} = ${fmt(w/g,4)} → <b>${fmt(round(w/g*100,2))} %</b>`};
+ }},
+ {id:"zunahme", label:"Zunahme & Abnahme", make(){
+   const g = R(8,60)*25, p = pick([5,8,10,12,15,20,25,30]), rauf = Math.random() < .5;
+   const f = rauf ? 1+p/100 : 1-p/100;
+   return {q:`Ein Preis von ${m(fmt(g)+" €")} ${rauf?"steigt":"sinkt"} um ${m(p+" %")}. Wie hoch ist der neue Preis?`,
+     num:round(g*f,2), unit:"€", dec:2,
+     sol:`Faktor ${fmt(f)} → ${g} · ${fmt(f)} = <b>${eur(round(g*f,2))}</b>`};
+ }},
+ {id:"rueck", label:"Rückwärts rechnen", make(){
+   const g = R(8,50)*20, p = pick([10,20,25,50]), rauf = Math.random() < .5;
+   const f = rauf ? 1+p/100 : 1-p/100, neu = round(g*f,2);
+   return {q:`Nach einer ${rauf?"Erhöhung":"Senkung"} um ${m(p+" %")} kostet eine Ware ${m(fmt(neu,2)+" €")}. Wie war der alte Preis?`,
+     num:g, unit:"€", dec:2,
+     sol:`Der alte Preis war 100 %, der neue ${fmt(f*100)} %. Also ${fmt(neu,2)} : ${fmt(f)} = <b>${eur(g)}</b>`};
+ }}]});
+
+T({id:"zinsen", kl:7, title:"Zinsrechnung", desc:"Jahres-, Monats- und Tageszinsen, Zinseszins.",
+expl:`<p class="lead">Zinsrechnung ist Prozentrechnung mit anderen Namen — plus einer Zutat: der Zeit.</p>
+<table class="tbl">
+<tr><td class="f">Kapital K</td><td>der Geldbetrag (= Grundwert)</td></tr>
+<tr><td class="f">Zinssatz p</td><td>Prozent <b>pro Jahr</b></td></tr>
+<tr><td class="f">Zinsen Z</td><td>was dazukommt (= Prozentwert)</td></tr>
+</table>
+<h3>Jahreszinsen</h3>
+<div class="ex">Z = K · p<br>2500 € zu 3 % → Z = 2500 · 0,03 = <b>75 €</b></div>
+<h3>Kürzere Zeiträume</h3>
+<ol class="steps">
+<li>Der Zinssatz gilt immer für ein <b>ganzes Jahr</b>.</li>
+<li>Für Monate: mal ${frac("Monate",12)} · Für Tage: mal ${frac("Tage",360)}.</li>
+<li>In der Zinsrechnung hat ein Jahr 360 Tage und jeder Monat 30 Tage (Bankjahr).</li>
+</ol>
+<div class="ex">2500 € zu 3 % für 5 Monate: 75 € · ${frac(5,12)} = <b>31,25 €</b></div>
+<h3>Zinseszins</h3>
+<div class="rule">Bleiben die Zinsen auf dem Konto, werden sie im nächsten Jahr mitverzinst:<br>
+K<sub>n</sub> = K · (1 + p)<sup>n</sup><br>
+1000 € zu 4 % über 3 Jahre: 1000 · 1,04³ = <b>1124,86 €</b> — also mehr als 3 · 40 € = 120 €.</div>`,
+gens:[
+ {id:"jahr", label:"Jahreszinsen", make(){
+   const k = R(4,60)*250, p = pick([1,1.5,2,2.5,3,3.5,4,5]);
+   return {q:`Wie viel Zinsen bringen ${m(k+" €")} in einem Jahr bei ${m(fmt(p)+" %")}?`,
+     num:round(k*p/100,2), unit:"€", dec:2,
+     sol:`Z = ${k} · ${fmt(p/100)} = <b>${eur(round(k*p/100,2))}</b>`};
+ }},
+ {id:"monate", label:"Monatszinsen", make(){
+   const k = R(4,40)*250, p = pick([2,3,4,5,6]), mo = pick([2,3,4,5,6,8,9,10]);
+   const z = round(k*p/100*mo/12, 2);
+   return {q:`${m(k+" €")} werden für ${m(mo+" Monate")} zu ${m(p+" %")} angelegt. Wie hoch sind die Zinsen?`,
+     num:z, unit:"€", dec:2,
+     sol:`Jahreszinsen: ${fmt(k*p/100,2)} €. Davon ${mo}/12 → <b>${eur(z)}</b>`};
+ }},
+ {id:"satz", label:"Zinssatz gesucht", make(){
+   const k = R(4,40)*500, p = pick([1,2,2.5,3,4,5]);
+   const z = round(k*p/100,2);
+   return {q:`${m(k+" €")} bringen in einem Jahr ${m(fmt(z,2)+" €")} Zinsen. Wie hoch ist der Zinssatz?`,
+     num:p, unit:"%", dec:2,
+     sol:`p = Z : K = ${fmt(z,2)} : ${k} = ${fmt(p/100,4)} → <b>${fmt(p)} %</b>`};
+ }},
+ {id:"zinseszins", label:"Zinseszins", make(){
+   const k = R(2,20)*500, p = pick([2,3,4,5]), n = R(2,6);
+   const e = round(k*(1+p/100)**n, 2);
+   return {q:`${m(k+" €")} werden ${m(n+" Jahre")} lang mit ${m(p+" %")} verzinst (Zinsen bleiben auf dem Konto). Wie hoch ist das Endkapital?`,
+     num:e, unit:"€", dec:2,
+     sol:`K<sub>${n}</sub> = ${k} · ${fmt(1+p/100)}<sup>${n}</sup> = <b>${eur(e)}</b>`};
+ }}]});
+
+T({id:"dreisatz", kl:7, title:"Zuordnungen & Dreisatz", desc:"Proportional, antiproportional, Maßstab.",
+expl:`<p class="lead">Beim Dreisatz geht man immer über die <b>Eins</b> — deshalb der Name: gegebene Größe, Einheit, gesuchte Größe.</p>
+<h3>Proportional (je mehr, desto mehr)</h3>
+<ol class="steps">
+<li>Gegeben: 5 Hefte kosten 7,50 €.</li>
+<li>Auf eins herunterrechnen: 1 Heft kostet 7,50 : 5 = 1,50 €.</li>
+<li>Auf die gesuchte Menge hochrechnen: 8 Hefte kosten 8 · 1,50 = <b>12 €</b>.</li>
+</ol>
+<div class="rule">Erkennungszeichen: Verdoppelt sich die eine Größe, verdoppelt sich auch die andere.
+Der <b>Quotient</b> y : x ist immer gleich (der Proportionalitätsfaktor).</div>
+<h3>Antiproportional (je mehr, desto weniger)</h3>
+<ol class="steps">
+<li>Gegeben: 4 Arbeiter brauchen 12 Stunden.</li>
+<li>Auf eins: 1 Arbeiter bräuchte 4 · 12 = 48 Stunden — hier wird <b>mal</b>genommen.</li>
+<li>Auf die gesuchte Zahl: 6 Arbeiter brauchen 48 : 6 = <b>8 Stunden</b>.</li>
+</ol>
+<div class="rule">Erkennungszeichen: Doppelt so viele Arbeiter, halbe Zeit. Hier ist das <b>Produkt</b> x · y immer gleich.<br>
+<b>Vorsicht:</b> Nicht jede Zuordnung ist eines von beidem. Alter und Körpergröße sind weder proportional noch antiproportional.</div>
+<h3>Maßstab</h3>
+<div class="ex">Maßstab 1 : 25 000 heißt: 1 cm auf der Karte = 25 000 cm = 250 m in Wirklichkeit.</div>`,
+gens:[
+ {id:"pro", label:"Proportional", make(){
+   const n = R(3,9), pr = round(R(80,900)/100,2), k = R(2,15);
+   const ges = round(n*pr,2);
+   return {q:`${m(n)} gleiche Artikel kosten ${m(fmt(ges,2)+" €")}. Was kosten ${m(k)} Artikel?`,
+     num:round(k*pr,2), unit:"€", dec:2,
+     sol:`1 Artikel: ${fmt(ges,2)} : ${n} = ${fmt(pr,2)} € → ${k} · ${fmt(pr,2)} = <b>${eur(round(k*pr,2))}</b>`};
+ }},
+ {id:"anti", label:"Antiproportional", make(){
+   const a = R(2,8), h = R(4,24), b = R(2,12);
+   const prod = a*h;
+   return {q:`${m(a+" Arbeiter")} brauchen für einen Auftrag ${m(h+" Stunden")}. Wie lange brauchen ${m(b+" Arbeiter")}?`,
+     num:round(prod/b,2), unit:"h", dec:2,
+     sol:`1 Arbeiter bräuchte ${a} · ${h} = ${prod} h → ${prod} : ${b} = <b>${fmt(round(prod/b,2))} h</b>`};
+ }},
+ {id:"erkennen", label:"Zuordnungsart erkennen", make(){
+   const f = pick([
+     ["Anzahl der Brötchen und Gesamtpreis", 0],
+     ["Anzahl der Maler und Zeit für einen Anstrich", 1],
+     ["Geschwindigkeit und Fahrzeit für eine feste Strecke", 1],
+     ["Gefahrene Kilometer und Benzinverbrauch", 0],
+     ["Anzahl der Gäste und Menge Kuchen pro Person (fester Kuchen)", 1],
+     ["Arbeitszeit und Lohn bei festem Stundenlohn", 0]]);
+   return {q:`Welche Zuordnung liegt vor? <b>${f[0]}</b>`, opts:["proportional","antiproportional"], ai:f[1],
+     sol: f[1] ? `Je mehr, desto weniger → <b>antiproportional</b> (Produkt bleibt gleich).`
+               : `Je mehr, desto mehr → <b>proportional</b> (Quotient bleibt gleich).`};
+ }},
+ {id:"massstab", label:"Maßstab", make(){
+   const ms = pick([500,1000,25000,50000,100000]), cm = R(2,25);
+   const meter = cm*ms/100;
+   return {q:`Auf einer Karte im Maßstab ${m("1 : "+ms.toLocaleString("de-DE"))} sind zwei Orte ${m(cm+" cm")} entfernt. Wie weit sind sie in Wirklichkeit (in Metern)?`,
+     num:meter, unit:"m", dec:2,
+     sol:`${cm} · ${ms} = ${(cm*ms).toLocaleString("de-DE")} cm = <b>${fmt(meter)} m</b>`};
+ }}]});
+
+T({id:"dreieck", kl:7, title:"Dreiecke & Winkelsätze", desc:"Winkelsumme, Außenwinkel, besondere Dreiecke.",
+expl:`<p class="lead">Alles beginnt mit einem Satz: In jedem Dreieck ergeben die drei Innenwinkel zusammen <b>180°</b>.</p>
+<h3>Dreiecksarten</h3>
+<table class="tbl">
+<tr><td class="f">gleichseitig</td><td>drei gleiche Seiten, alle Winkel 60°</td></tr>
+<tr><td class="f">gleichschenklig</td><td>zwei gleiche Seiten (Schenkel), die beiden <b>Basiswinkel</b> sind gleich groß</td></tr>
+<tr><td class="f">rechtwinklig</td><td>ein Winkel ist 90°, die anderen beiden ergeben zusammen 90°</td></tr>
+</table>
+<h3>Winkel am gleichschenkligen Dreieck</h3>
+<ol class="steps">
+<li>Ist der Winkel an der Spitze bekannt: Basiswinkel = (180° − Spitze) : 2.</li>
+<li>Ist ein Basiswinkel bekannt: Spitze = 180° − 2 · Basiswinkel.</li>
+</ol>
+<h3>Außenwinkel</h3>
+<div class="rule">Ein Außenwinkel ist so groß wie die <b>Summe der beiden nicht anliegenden Innenwinkel</b>.
+Er ergänzt seinen Innenwinkel zu 180°.</div>
+<h3>Dreiecksungleichung</h3>
+<div class="rule">Ein Dreieck existiert nur, wenn jede Seite kürzer ist als die Summe der beiden anderen.
+Mit 3 cm, 4 cm und 9 cm geht es nicht: 3 + 4 = 7 < 9.</div>`,
+gens:[
+ {id:"summe", label:"Dritter Winkel", make(){
+   const a = R(20,100), b = R(20, 170-a);
+   return {q:`Ein Dreieck hat die Winkel α = ${m(a+"°")} und β = ${m(b+"°")}. Berechne γ.`,
+     num:180-a-b, unit:"°", sol:`γ = 180° − ${a}° − ${b}° = <b>${180-a-b}°</b>`};
+ }},
+ {id:"gleichschenklig", label:"Gleichschenklig", make(){
+   if(Math.random() < .5){
+     const s = R(20,140);
+     return {q:`In einem gleichschenkligen Dreieck beträgt der Winkel an der Spitze ${m(s+"°")}. Wie groß ist ein Basiswinkel?`,
+       num:(180-s)/2, unit:"°", dec:1, sol:`(180° − ${s}°) : 2 = <b>${fmt((180-s)/2)}°</b>`};
+   }
+   const b = R(20,80);
+   return {q:`In einem gleichschenkligen Dreieck beträgt ein Basiswinkel ${m(b+"°")}. Wie groß ist der Winkel an der Spitze?`,
+     num:180-2*b, unit:"°", sol:`180° − 2 · ${b}° = <b>${180-2*b}°</b>`};
+ }},
+ {id:"aussen", label:"Außenwinkel", make(){
+   const a = R(25,90), b = R(25,100);
+   return {q:`In einem Dreieck sind α = ${m(a+"°")} und β = ${m(b+"°")}. Wie groß ist der Außenwinkel bei γ?`,
+     num:a+b, unit:"°",
+     sol:`Der Außenwinkel entspricht der Summe der beiden nicht anliegenden Innenwinkel: ${a}° + ${b}° = <b>${a+b}°</b>`};
+ }},
+ {id:"ungleichung", label:"Dreiecksungleichung", make(){
+   const geht = Math.random() < .5;
+   let a,b,c;
+   if(geht){ a = R(4,12); b = R(4,12); c = R(Math.abs(a-b)+1, a+b-1); }
+   else { a = R(2,6); b = R(2,6); c = a+b+R(1,5); }
+   const s = shuffle([a,b,c]);
+   return {q:`Gibt es ein Dreieck mit den Seiten ${m(s.join(" cm, ")+" cm")}?`,
+     opts:["ja","nein"], ai: geht?0:1,
+     sol: geht ? `Jede Seite ist kürzer als die Summe der beiden anderen → das Dreieck existiert.`
+               : `${Math.max(...s)} ist nicht kleiner als ${s.reduce((x,y)=>x+y,0)-Math.max(...s)} → kein Dreieck.`};
+ }}]});
+
+/* ---------------- KLASSE 8 ---------------- */
+
+T({id:"binom", kl:8, title:"Binomische Formeln & Faktorisieren", desc:"Ausmultiplizieren, binomische Formeln, Ausklammern.",
+expl:`<p class="lead">Zwei Klammern malnehmen heißt: <b>jeder mit jedem</b>. Die binomischen Formeln sind nur die drei Fälle, die besonders oft vorkommen.</p>
+<h3>Jeder mit jedem</h3>
+<div class="ex">(a + b)(c + d) = ac + ad + bc + bd<br>(x + 3)(x − 5) = x² − 5x + 3x − 15 = x² − 2x − 15</div>
+<h3>Die drei binomischen Formeln</h3>
+<table class="tbl">
+<tr><td class="f">1.</td><td class="f">(a + b)² = a² + 2ab + b²</td><td>(x + 4)² = x² + 8x + 16</td></tr>
+<tr><td class="f">2.</td><td class="f">(a − b)² = a² − 2ab + b²</td><td>(x − 4)² = x² − 8x + 16</td></tr>
+<tr><td class="f">3.</td><td class="f">(a + b)(a − b) = a² − b²</td><td>(x + 4)(x − 4) = x² − 16</td></tr>
+</table>
+<div class="rule"><b>Der Standardfehler:</b> (x + 4)² ist <u>nicht</u> x² + 16. Das mittlere Glied 2ab fehlt dann.
+Probier es mit Zahlen: (2 + 3)² = 25, aber 2² + 3² = 13.</div>
+<h3>Faktorisieren — rückwärts</h3>
+<ol class="steps">
+<li>Steht in jedem Summanden derselbe Faktor? Dann <b>ausklammern</b>: 6x² + 9x = 3x(2x + 3).</li>
+<li>Sieht der Term aus wie a² − b²? Dann dritte Formel rückwärts: x² − 25 = (x + 5)(x − 5).</li>
+<li>Passt a² ± 2ab + b²? Dann erste oder zweite Formel rückwärts: x² + 6x + 9 = (x + 3)².</li>
+</ol>`,
+gens:[
+ {id:"ausmult", label:"Ausmultiplizieren", make(){
+   const a = Rn(-9,9), b = Rn(-9,9);
+   const s = a+b, p = a*b;
+   return {q:`Multipliziere aus: ${m(`(x ${pmt(a)})(x ${pmt(b)})`)}`,
+     a:[`x^2${s>=0?"+"+s:s}x${p>=0?"+"+p:p}`.replace("+1x","+x").replace("-1x","-x"),
+        `x^2${s>=0?"+"+s:s}x${p>=0?"+"+p:p}`],
+     label:"Term (x^2+…)", hint:"x² als x^2 schreiben",
+     sol:`Jeder mit jedem: x² ${sgn(b)}x ${sgn(a)}x ${pmt(p)} → <b>x² ${pmt(s,"x")} ${pmt(p)}</b>`};
+ }},
+ {id:"binomisch", label:"Binomische Formeln", make(){
+   const a = R(2,12), art = R(1,3);
+   if(art === 3)
+     return {q:`Wende die passende binomische Formel an: ${m(`(x + ${a})(x − ${a})`)}`,
+       a:[`x^2-${a*a}`], label:"Term", hint:"x² als x^2 schreiben",
+       sol:`3. binomische Formel: x² − ${a}² = <b>x² − ${a*a}</b>`};
+   const vz = art === 1 ? "+" : "−";
+   return {q:`Wende die passende binomische Formel an: ${m(`(x ${vz} ${a})²`)}`,
+     a:[`x^2${art===1?"+":"-"}${2*a}x+${a*a}`], label:"Term", hint:"x² als x^2 schreiben",
+     sol:`${art}. binomische Formel: x² ${vz} 2·${a}·x + ${a}² = <b>x² ${vz} ${2*a}x + ${a*a}</b>`};
+ }},
+ {id:"ausklammern", label:"Ausklammern", make(){
+   const f = R(2,9), a = R(2,9), b = R(2,12);
+   return {q:`Klammere so weit wie möglich aus: ${m(`${f*a}x² + ${f*b}x`)}`,
+     a:[`${f}x(${a}x+${b})`, `${f}x*(${a}x+${b})`], label:"Term (z. B. 3x(2x+5))",
+     sol:`Gemeinsam ist ${f}x → <b>${f}x(${a}x + ${b})</b>`};
+ }},
+ {id:"faktorisieren", label:"Faktorisieren", make(){
+   const a = R(2,12);
+   if(Math.random() < .5)
+     return {q:`Faktorisiere: ${m(`x² − ${a*a}`)}`, a:[`(x+${a})(x-${a})`,`(x-${a})(x+${a})`], label:"Term",
+       sol:`3. binomische Formel rückwärts: x² − ${a}² = <b>(x + ${a})(x − ${a})</b>`};
+   const vz = Math.random() < .5;
+   return {q:`Faktorisiere: ${m(`x² ${vz?"+":"−"} ${2*a}x + ${a*a}`)}`,
+     a:[`(x${vz?"+":"-"}${a})^2`, `(x${vz?"+":"-"}${a})(x${vz?"+":"-"}${a})`], label:"Term",
+     sol:`Passt zur ${vz?1:2}. binomischen Formel: <b>(x ${vz?"+":"−"} ${a})²</b>`};
+ }}]});
+
+T({id:"linfunk", kl:8, title:"Lineare Funktionen", desc:"Steigung, y-Achsenabschnitt, Geradengleichung.",
+expl:`<p class="lead">Eine lineare Funktion hat die Form <b>y = mx + b</b> und ihr Graph ist immer eine Gerade.</p>
+<table class="tbl">
+<tr><td class="f">m</td><td>Steigung: wie viel y sich ändert, wenn x um 1 wächst</td></tr>
+<tr><td class="f">b</td><td>y-Achsenabschnitt: dort schneidet die Gerade die y-Achse (x = 0)</td></tr>
+</table>
+<h3>Steigung aus zwei Punkten</h3>
+<div class="ex">m = ${frac("y₂ − y₁","x₂ − x₁")}<br>
+P(2|3) und Q(6|11): m = ${frac("11 − 3","6 − 2")} = ${frac(8,4)} = <b>2</b></div>
+<div class="rule"><b>Steigungsdreieck:</b> m = 2 heißt „1 nach rechts, 2 nach oben".
+Bei m = −0,5 geht es 1 nach rechts und 0,5 nach unten. Positive Steigung → Gerade steigt, negative → sie fällt.</div>
+<h3>Geradengleichung aufstellen</h3>
+<ol class="steps">
+<li>Steigung m aus zwei Punkten berechnen.</li>
+<li>Einen Punkt in y = mx + b einsetzen.</li>
+<li>Nach b auflösen.</li>
+<li>m und b in die Gleichung schreiben.</li>
+</ol>
+<div class="ex">P(2|3), m = 2 → 3 = 2·2 + b → b = −1 → <b>y = 2x − 1</b></div>
+<h3>Nullstelle</h3>
+<p>Dort ist y = 0: 0 = mx + b → x = −b : m. Das ist der Schnittpunkt mit der x-Achse.</p>`,
+gens:[
+ {id:"steigung", label:"Steigung aus 2 Punkten", make(){
+   const x1 = Rn(-8,8), x2 = Rn(-8,8) + (x1===0?1:0), m0 = Rn(-6,6);
+   const X2 = x2 === x1 ? x1+R(1,4) : x2;
+   const y1 = Rn(-9,9), y2 = y1 + m0*(X2-x1);
+   return {q:`Berechne die Steigung der Geraden durch ${m(`P(${x1}|${y1})`)} und ${m(`Q(${X2}|${y2})`)}.`,
+     num:m0, dec:3, label:"m",
+     sol:`m = (${y2} − ${y1}) : (${X2} − ${x1}) = ${y2-y1} : ${X2-x1} = <b>${fmt(m0)}</b>`};
+ }},
+ {id:"gerade", label:"Geradengleichung", make(){
+   const m0 = Rn(-5,5), b = Rn(-9,9), x1 = Rn(-6,6);
+   const y1 = m0*x1 + b;
+   return {q:`Eine Gerade hat die Steigung ${m("m = "+m0)} und geht durch ${m(`P(${x1}|${y1})`)}. Wie heißt der y-Achsenabschnitt b?`,
+     num:b, label:"b",
+     sol:`${y1} = ${m0} · ${x1} + b → ${y1} = ${m0*x1} + b → b = <b>${b}</b>, also y = ${m0}x ${pmt(b)}`};
+ }},
+ {id:"punktprobe", label:"Punktprobe & Werte", make(){
+   const m0 = Rn(-5,5), b = Rn(-9,9), x = Rn(-8,8);
+   return {q:`Gegeben ist ${m(`y = ${m0}x ${pmt(b)}`)}. Welchen y-Wert hat der Punkt mit ${m("x = "+x)}?`,
+     num:m0*x+b, label:"y",
+     sol:`y = ${m0} · (${x}) ${pmt(b)} = <b>${m0*x+b}</b>`};
+ }},
+ {id:"nullstelle", label:"Nullstelle", make(){
+   const m0 = Rn(-6,6), x0 = Rn(-8,8);
+   const b = -m0*x0;
+   return {q:`Berechne die Nullstelle von ${m(`y = ${m0}x ${pmt(b)}`)}.`,
+     num:x0, dec:3, label:"x",
+     sol:`0 = ${m0}x ${pmt(b)} → ${m0}x = ${-b} → x = <b>${fmt(x0)}</b>`};
+ }}]});
+
+T({id:"lgs", kl:8, title:"Lineare Gleichungssysteme", desc:"Zwei Gleichungen, zwei Unbekannte.",
+expl:`<p class="lead">Zwei Gleichungen mit x und y — gesucht ist das Zahlenpaar, das <b>beide</b> erfüllt. Grafisch: der Schnittpunkt zweier Geraden.</p>
+<h3>Einsetzungsverfahren</h3>
+<ol class="steps">
+<li>Eine Gleichung nach einer Variablen auflösen, am besten dort, wo eine 1 davorsteht.</li>
+<li>Diesen Ausdruck in die <b>andere</b> Gleichung einsetzen.</li>
+<li>Die entstandene Gleichung mit nur einer Variablen lösen.</li>
+<li>Das Ergebnis zurück einsetzen und die zweite Variable berechnen.</li>
+</ol>
+<h3>Additionsverfahren</h3>
+<ol class="steps">
+<li>Beide Gleichungen so multiplizieren, dass eine Variable gleich große, entgegengesetzte Vorzeichen bekommt.</li>
+<li>Gleichungen addieren — diese Variable fällt weg.</li>
+<li>Rest lösen und zurück einsetzen.</li>
+</ol>
+<div class="ex">I: 2x + 3y = 12<br>II: x − 3y = 3<br>I + II: 3x = 15 → x = 5 → in II: 5 − 3y = 3 → y = <b>⅔</b></div>
+<div class="rule"><b>Probe nicht vergessen:</b> Setze das Paar in <u>beide</u> Gleichungen ein. Nur wenn beide stimmen, ist es die Lösung.<br>
+<b>Sonderfälle:</b> Kommt 0 = 0 heraus, sind die Geraden identisch (unendlich viele Lösungen). Kommt 0 = 5 heraus,
+sind sie parallel (keine Lösung).</div>`,
+gens:[
+ {id:"loesen", label:"Gleichungssystem lösen", make(){
+   const x = Rn(-8,8), y = Rn(-8,8);
+   const a = Rn(-5,5), b = Rn(-5,5), c = Rn(-5,5), d = Rn(-5,5);
+   if(a*d - b*c === 0) return this.make();
+   const e = a*x + b*y, f = c*x + d*y;
+   const t = (k,v) => `${k===1?"":k===-1?"−":k}${v}`;
+   return {q:`Löse das Gleichungssystem:<br>${m(`I: ${t(a,"x")} ${pmt(b)}y = ${e}`)}<br>${m(`II: ${t(c,"x")} ${pmt(d)}y = ${f}`)}`,
+     fields:[{label:"x", num:x},{label:"y", num:y}],
+     sol:`Additionsverfahren: I·${d} − II·${b} liefert x = <b>${x}</b>, eingesetzt y = <b>${y}</b>. Probe in I: ${a}·${x} ${b<0?"−":"+"} ${Math.abs(b)}·${y} = ${e} ✓`};
+ }},
+ {id:"einsetzen", label:"Einsetzungsverfahren", make(){
+   const x = Rn(-9,9), y = Rn(-9,9), a = Rn(-4,4), c = Rn(-5,5), d = Rn(-5,5);
+   const b = y - a*x;                       // II: y = ax + b
+   const f = c*x + d*y;
+   return {q:`Löse durch Einsetzen:<br>${m(`I: ${c}x ${pmt(d)}y = ${f}`)}<br>${m(`II: y = ${a}x ${pmt(b)}`)}`,
+     fields:[{label:"x", num:x},{label:"y", num:y}],
+     sol:`II in I einsetzen: ${c}x ${d<0?"−":"+"} ${Math.abs(d)}·(${a}x ${b<0?"−":"+"} ${Math.abs(b)}) = ${f} → x = <b>${x}</b> → y = ${a}·${x} ${b<0?"−":"+"} ${Math.abs(b)} = <b>${y}</b>`};
+ }},
+ {id:"sach", label:"Sachaufgabe", make(){
+   const a = R(2,9), b = R(2,9);          // Anzahlen
+   const p1 = R(2,9), p2 = R(2,9);        // Preise
+   if(p1 === p2) return this.make();
+   const sum = a+b, kosten = a*p1 + b*p2;
+   return {q:`${m(sum)} Karten kosten zusammen ${m(kosten+" €")}. Eine Kinderkarte kostet ${m(p1+" €")}, eine Erwachsenenkarte ${m(p2+" €")}. Wie viele Karten jeder Sorte waren es?`,
+     fields:[{label:"Kinderkarten", num:a},{label:"Erwachsenenkarten", num:b}],
+     sol:`x + y = ${sum} und ${p1}x + ${p2}y = ${kosten} → x = <b>${a}</b>, y = <b>${b}</b>`};
+ }}]});
+
+T({id:"flaeche2", kl:8, title:"Flächen: Dreieck, Parallelogramm, Trapez", desc:"Formeln für Vielecke und zusammengesetzte Flächen.",
+expl:`<p class="lead">Alle diese Formeln lassen sich auf das Rechteck zurückführen — deshalb muss man sich nur merken, wo das Rechteck steckt.</p>
+<h3>Die Formeln</h3>
+<table class="tbl">
+<tr><td class="f">Dreieck</td><td class="f">A = ½ · g · h</td><td>ein Dreieck ist ein halbes Parallelogramm</td></tr>
+<tr><td class="f">Parallelogramm</td><td class="f">A = g · h</td><td>eine Ecke abschneiden und anlegen → Rechteck</td></tr>
+<tr><td class="f">Trapez</td><td class="f">A = ½ · (a + c) · h</td><td>Mittelwert der beiden parallelen Seiten mal Höhe</td></tr>
+<tr><td class="f">Raute</td><td class="f">A = ½ · e · f</td><td>halbes Produkt der Diagonalen</td></tr>
+</table>
+<div class="rule"><b>Die Höhe steht immer senkrecht auf der Grundseite</b> — sie ist nicht die schräge Seite!
+Das ist der mit Abstand häufigste Fehler bei diesen Aufgaben.</div>
+<h3>Zusammengesetzte Flächen</h3>
+<ol class="steps">
+<li>Figur in Rechtecke, Dreiecke und Trapeze zerlegen.</li>
+<li>Jede Teilfläche einzeln berechnen.</li>
+<li>Addieren — oder bei ausgeschnittenen Teilen subtrahieren.</li>
+</ol>`,
+gens:[
+ {id:"dreieck", label:"Dreieck", make(){
+   const g = R(4,30), h = R(3,24);
+   if(Math.random() < .65)
+     return {q:`Ein Dreieck hat die Grundseite ${m(g+" cm")} und die Höhe ${m(h+" cm")}. Berechne den Flächeninhalt.`,
+       num:g*h/2, unit:"cm²", dec:2, sol:`A = ½ · ${g} · ${h} = <b>${fmt(g*h/2)} cm²</b>`};
+   return {q:`Ein Dreieck hat den Flächeninhalt ${m(fmt(g*h/2)+" cm²")} und die Grundseite ${m(g+" cm")}. Wie hoch ist es?`,
+     num:h, unit:"cm", dec:2, sol:`h = 2A : g = ${fmt(g*h)} : ${g} = <b>${h} cm</b>`};
+ }},
+ {id:"parallelogramm", label:"Parallelogramm", make(){
+   const g = R(5,25), h = R(3,20);
+   return {q:`Ein Parallelogramm hat die Grundseite ${m(g+" cm")} und die Höhe ${m(h+" cm")}. Berechne den Flächeninhalt.`,
+     num:g*h, unit:"cm²", sol:`A = ${g} · ${h} = <b>${g*h} cm²</b>`};
+ }},
+ {id:"trapez", label:"Trapez", make(){
+   const a = R(8,30), c = R(3,a-1), h = R(3,18);
+   return {q:`Ein Trapez hat die parallelen Seiten ${m(a+" cm")} und ${m(c+" cm")} sowie die Höhe ${m(h+" cm")}. Berechne den Flächeninhalt.`,
+     num:(a+c)*h/2, unit:"cm²", dec:2,
+     sol:`A = ½ · (${a} + ${c}) · ${h} = ½ · ${a+c} · ${h} = <b>${fmt((a+c)*h/2)} cm²</b>`};
+ }},
+ {id:"raute", label:"Raute", make(){
+   const e = R(4,24), f = R(4,24);
+   return {q:`Eine Raute hat die Diagonalen ${m(e+" cm")} und ${m(f+" cm")}. Berechne den Flächeninhalt.`,
+     num:e*f/2, unit:"cm²", dec:2, sol:`A = ½ · ${e} · ${f} = <b>${fmt(e*f/2)} cm²</b>`};
+ }}]});
+
+T({id:"kreis", kl:8, title:"Kreis", desc:"Umfang, Flächeninhalt, Kreisteile.",
+expl:`<p class="lead">Der Kreis hat nur eine Maßzahl — den Radius — und eine besondere Zahl: π ≈ 3,14159.</p>
+<h3>Die Formeln</h3>
+<div class="ex">Umfang:  U = 2 · π · r = π · d<br>Fläche:  A = π · r²<br>Durchmesser: d = 2r</div>
+<div class="rule"><b>Woher kommt π?</b> Teilt man bei <u>jedem</u> Kreis den Umfang durch den Durchmesser, kommt immer
+dieselbe Zahl heraus: 3,14159… Genau das ist π.</div>
+<h3>Rückwärts rechnen</h3>
+<ol class="steps">
+<li>Umfang gegeben, Radius gesucht: r = U : (2π).</li>
+<li>Fläche gegeben, Radius gesucht: erst durch π teilen, dann die Wurzel ziehen: r = √(A : π).</li>
+</ol>
+<h3>Kreisteile</h3>
+<div class="rule">Ein Kreisausschnitt mit dem Mittelpunktswinkel α ist der Anteil ${frac("α","360°")} vom ganzen Kreis:<br>
+Bogen b = ${frac("α","360°")} · 2πr   ·   Fläche A = ${frac("α","360°")} · πr²</div>
+<div class="rule"><b>Achtung beim Runden:</b> Erst ganz am Ende runden. Wer zwischendurch π = 3,14 einsetzt und rundet,
+bekommt bei großen Zahlen deutlich falsche Ergebnisse.</div>`,
+gens:[
+ {id:"umfang", label:"Umfang & Fläche", make(){
+   const r = R(2,25);
+   return {q:`Ein Kreis hat den Radius ${m(r+" cm")}. Berechne Umfang und Flächeninhalt (auf 2 Stellen gerundet).`,
+     fields:[{label:"Umfang", num:2*Math.PI*r, unit:"cm", dec:2},{label:"Fläche", num:Math.PI*r*r, unit:"cm²", dec:2}],
+     sol:`U = 2 · π · ${r} = <b>${fmt(2*Math.PI*r,2)} cm</b> · A = π · ${r}² = <b>${fmt(Math.PI*r*r,2)} cm²</b>`};
+ }},
+ {id:"durchmesser", label:"Aus dem Durchmesser", make(){
+   const d = R(4,40);
+   return {q:`Ein Kreis hat den Durchmesser ${m(d+" cm")}. Berechne den Flächeninhalt (2 Nachkommastellen).`,
+     num:Math.PI*(d/2)**2, unit:"cm²", dec:2,
+     sol:`r = ${d} : 2 = ${fmt(d/2)} cm → A = π · ${fmt(d/2)}² = <b>${fmt(Math.PI*(d/2)**2,2)} cm²</b>`};
+ }},
+ {id:"rueck", label:"Rückwärts", make(){
+   const r = R(2,20);
+   if(Math.random() < .5)
+     return {q:`Ein Kreis hat den Umfang ${m(fmt(2*Math.PI*r,2)+" cm")}. Wie groß ist der Radius?`,
+       num:r, unit:"cm", dec:2, sol:`r = U : (2π) = ${fmt(2*Math.PI*r,2)} : ${fmt(2*Math.PI,4)} = <b>${r} cm</b>`};
+   return {q:`Ein Kreis hat den Flächeninhalt ${m(fmt(Math.PI*r*r,2)+" cm²")}. Wie groß ist der Radius?`,
+     num:r, unit:"cm", dec:2,
+     sol:`r = √(A : π) = √(${fmt(Math.PI*r*r,2)} : π) = √${r*r} = <b>${r} cm</b>`};
+ }},
+ {id:"ausschnitt", label:"Kreisausschnitt", make(){
+   const r = R(3,20), a = pick([30,45,60,90,120,135,150,180,270]);
+   return {q:`Ein Kreisausschnitt mit dem Radius ${m(r+" cm")} hat den Mittelpunktswinkel ${m(a+"°")}. Berechne seinen Flächeninhalt (2 Nachkommastellen).`,
+     num:a/360*Math.PI*r*r, unit:"cm²", dec:2,
+     sol:`A = ${a}/360 · π · ${r}² = ${fmt(a/360,4)} · ${fmt(Math.PI*r*r,2)} = <b>${fmt(a/360*Math.PI*r*r,2)} cm²</b>`};
+ }}]});
+
+T({id:"wsk1", kl:8, title:"Wahrscheinlichkeit", desc:"Laplace, Gegenereignis, Häufigkeiten.",
+expl:`<p class="lead">Eine Wahrscheinlichkeit ist eine Zahl zwischen 0 und 1: 0 heißt unmöglich, 1 heißt sicher. Oft schreibt man sie als Bruch oder in Prozent.</p>
+<h3>Die Laplace-Formel</h3>
+<div class="ex">P(E) = ${frac("Anzahl der günstigen Ergebnisse","Anzahl aller möglichen Ergebnisse")}</div>
+<p>Sie gilt nur, wenn alle Ergebnisse <b>gleich wahrscheinlich</b> sind — bei einem fairen Würfel oder einer gut gemischten Urne.</p>
+<div class="ex">Würfel, gerade Zahl: günstig sind 2, 4, 6 → P = ${frac(3,6)} = ${frac(1,2)} = 50 %</div>
+<h3>Gegenereignis</h3>
+<div class="rule">P(nicht E) = 1 − P(E).<br>
+Das spart oft viel Arbeit: „mindestens eine Sechs" ist mühsam, „gar keine Sechs" ist leicht — und dann 1 minus das Ergebnis.</div>
+<h3>Von der Häufigkeit zur Wahrscheinlichkeit</h3>
+<p>Bei vielen Versuchen nähert sich die relative Häufigkeit der Wahrscheinlichkeit an (Gesetz der großen Zahlen).
+Aus 500 Würfen mit 78 Sechsen schätzt man P ≈ 78 : 500 = 0,156.</p>`,
+gens:[
+ {id:"laplace", label:"Laplace", make(){
+   const r = R(2,9), b = R(2,9), g = R(2,9);
+   const ges = r+b+g, f = pick([["rote",r],["blaue",b],["grüne",g]]);
+   return {q:`In einer Urne liegen ${m(r)} rote, ${m(b)} blaue und ${m(g)} grüne Kugeln. Wie groß ist die Wahrscheinlichkeit, eine ${f[0]} zu ziehen? (als Prozentwert, 2 Nachkommastellen)`,
+     num:round(f[1]/ges*100,2), unit:"%", dec:2,
+     sol:`P = ${f[1]}/${ges} = ${fmt(f[1]/ges,4)} = <b>${fmt(round(f[1]/ges*100,2))} %</b>`};
+ }},
+ {id:"wuerfel", label:"Würfel & Münze", make(){
+   const f = pick([
+     ["eine gerade Zahl", 3], ["eine Zahl größer als 4", 2], ["eine Primzahl (2, 3, 5)", 3],
+     ["eine Zahl kleiner als 3", 2], ["keine Sechs", 5], ["eine durch 3 teilbare Zahl", 2]]);
+   return {q:`Ein fairer Würfel wird geworfen. Wie wahrscheinlich ist es, ${f[0]} zu würfeln? (in Prozent, 2 Nachkommastellen)`,
+     num:round(f[1]/6*100,2), unit:"%", dec:2,
+     sol:`${f[1]} von 6 Ergebnissen sind günstig: P = ${f[1]}/6 = <b>${fmt(round(f[1]/6*100,2))} %</b>`};
+ }},
+ {id:"gegen", label:"Gegenereignis", make(){
+   const p = R(5,95);
+   return {q:`Ein Ereignis hat die Wahrscheinlichkeit ${m(p+" %")}. Wie wahrscheinlich ist das Gegenereignis?`,
+     num:100-p, unit:"%", sol:`P(nicht E) = 100 % − ${p} % = <b>${100-p} %</b>`};
+ }},
+ {id:"haeufig", label:"Relative Häufigkeit", make(){
+   const n = pick([200,250,400,500,800]), k = R(20, Math.floor(n/2));
+   return {q:`Bei ${m(n)} Versuchen tritt ein Ereignis ${m(k)}-mal ein. Wie groß ist die relative Häufigkeit in Prozent?`,
+     num:round(k/n*100,2), unit:"%", dec:2,
+     sol:`${k} : ${n} = ${fmt(k/n,4)} → <b>${fmt(round(k/n*100,2))} %</b>`};
+ }}]});
+</script>
+<script>
+/* ---------------- KLASSE 9 ---------------- */
+
+T({id:"potenzen", kl:9, title:"Potenzen, Wurzeln & Zehnerpotenzen", desc:"Potenzgesetze, Wurzeln, wissenschaftliche Schreibweise.",
+expl:`<p class="lead">Eine Potenz ist eine abgekürzte Multiplikation: 2⁵ = 2·2·2·2·2 = 32. Unten steht die <b>Basis</b>, oben der <b>Exponent</b>.</p>
+<h3>Die Potenzgesetze</h3>
+<table class="tbl">
+<tr><td class="f">a<sup>m</sup> · a<sup>n</sup> = a<sup>m+n</sup></td><td>gleiche Basis, mal → Exponenten addieren</td></tr>
+<tr><td class="f">a<sup>m</sup> : a<sup>n</sup> = a<sup>m−n</sup></td><td>gleiche Basis, geteilt → subtrahieren</td></tr>
+<tr><td class="f">(a<sup>m</sup>)<sup>n</sup> = a<sup>m·n</sup></td><td>Potenz einer Potenz → malnehmen</td></tr>
+<tr><td class="f">a<sup>0</sup> = 1</td><td>gilt für jede Basis außer 0</td></tr>
+<tr><td class="f">a<sup>−n</sup> = 1 : a<sup>n</sup></td><td>negativer Exponent = Kehrwert</td></tr>
+</table>
+<div class="rule"><b>Nur bei gleicher Basis!</b> 2³ · 5³ lässt sich nicht über die Exponenten zusammenfassen —
+aber es gilt a<sup>n</sup> · b<sup>n</sup> = (a·b)<sup>n</sup>, also 2³ · 5³ = 10³.</div>
+<h3>Wurzeln</h3>
+<p>√a ist die Zahl, die mit sich selbst malgenommen a ergibt. Teilweises Wurzelziehen:
+√72 = √(36 · 2) = 6√2 — man sucht die größte Quadratzahl im Radikanden.</p>
+<h3>Wissenschaftliche Schreibweise</h3>
+<ol class="steps">
+<li>Komma so verschieben, dass <b>genau eine Ziffer</b> vor dem Komma steht (1 bis 9).</li>
+<li>Zählen, um wie viele Stellen verschoben wurde — das ist der Exponent.</li>
+<li>Nach links verschoben → positiver Exponent, nach rechts → negativer.</li>
+</ol>
+<div class="ex">45 000 000 = 4,5 · 10<sup>7</sup>   ·   0,00032 = 3,2 · 10<sup>−4</sup></div>`,
+gens:[
+ {id:"gesetze", label:"Potenzgesetze", make(){
+   const a = pick([2,3,5,10]), m0 = R(2,6), n = R(2,5);
+   const art = R(1,3);
+   if(art === 1) return {q:`Vereinfache und berechne: ${m(`${a}^${m0} · ${a}^${n}`)}`, num:a**(m0+n),
+     sol:`Exponenten addieren: ${a}<sup>${m0+n}</sup> = <b>${a**(m0+n)}</b>`};
+   if(art === 2) return {q:`Vereinfache und berechne: ${m(`${a}^${m0+n} : ${a}^${n}`)}`, num:a**m0,
+     sol:`Exponenten subtrahieren: ${a}<sup>${m0}</sup> = <b>${a**m0}</b>`};
+   return {q:`Vereinfache und berechne: ${m(`(${a}^${m0})^2`)}`, num:a**(2*m0),
+     sol:`Exponenten malnehmen: ${a}<sup>${2*m0}</sup> = <b>${a**(2*m0)}</b>`};
+ }},
+ {id:"negativ", label:"Negative Exponenten", make(){
+   const a = pick([2,3,4,5,10]), n = R(1,3);
+   return {q:`Berechne ${m(`${a}^(−${n})`)} als Dezimalzahl.`, num:1/a**n, dec:5,
+     sol:`${a}<sup>−${n}</sup> = 1 : ${a}<sup>${n}</sup> = 1 : ${a**n} = <b>${fmt(1/a**n)}</b>`};
+ }},
+ {id:"wurzel", label:"Wurzeln", make(){
+   if(Math.random() < .5){
+     const n = R(4,30);
+     return {q:`Berechne ${m("√"+n*n)}`, num:n, sol:`${n} · ${n} = ${n*n} → <b>${n}</b>`};
+   }
+   const q0 = pick([4,9,16,25,36,49,64]), r = pick([2,3,5,6,7,10]);
+   return {q:`Ziehe teilweise die Wurzel: ${m("√"+q0*r)} = ? · √${r}`, num:Math.sqrt(q0),
+     sol:`√${q0*r} = √${q0} · √${r} = <b>${Math.sqrt(q0)}</b>√${r}`};
+ }},
+ {id:"zehner", label:"Zehnerpotenzen", make(){
+   const mant = round(R(100,999)/100, 2), e = pick([-6,-5,-4,-3,3,4,5,6,7,8]);
+   const v = mant * 10**e;
+   if(e < 0 || Math.random() < .5)
+     return {q:`Schreibe ${m(v.toLocaleString("de-DE",{maximumFractionDigits:12}))} in wissenschaftlicher Schreibweise. Wie lautet der Exponent von 10?`,
+       num:e, hint:"nur den Exponenten eintragen",
+       sol:`${v.toLocaleString("de-DE",{maximumFractionDigits:12})} = ${fmt(mant)} · 10<sup>${e}</sup> → Exponent <b>${e}</b>`};
+   return {q:`Berechne ${m(`${fmt(mant)} · 10^${e}`)} als gewöhnliche Zahl.`, num:v, tol:Math.abs(v)*1e-9,
+     sol:`Komma um ${Math.abs(e)} Stellen nach rechts → <b>${v.toLocaleString("de-DE",{maximumFractionDigits:12})}</b>`};
+ }}]});
+
+T({id:"pythagoras", kl:9, title:"Satz des Pythagoras", desc:"Seiten im rechtwinkligen Dreieck berechnen.",
+expl:`<p class="lead">Im <b>rechtwinkligen</b> Dreieck gilt: <b>a² + b² = c²</b> — dabei ist c immer die längste Seite, die dem rechten Winkel gegenüberliegt.</p>
+<div class="rule"><b>Kathete</b> = eine der beiden Seiten am rechten Winkel. <b>Hypotenuse</b> = die Seite gegenüber
+dem rechten Winkel, immer die längste.<br>Der Satz gilt <u>nur</u> bei einem rechten Winkel — ohne ihn ist jede Rechnung falsch.</div>
+<h3>Hypotenuse berechnen</h3>
+<ol class="steps">
+<li>Beide Katheten quadrieren: 3² = 9 und 4² = 16.</li>
+<li>Addieren: 9 + 16 = 25.</li>
+<li>Wurzel ziehen: c = √25 = <b>5</b>.</li>
+</ol>
+<h3>Kathete berechnen</h3>
+<ol class="steps">
+<li>Formel umstellen: a² = c² − b² — hier wird <b>subtrahiert</b>.</li>
+<li>Einsetzen: a² = 13² − 5² = 169 − 25 = 144.</li>
+<li>Wurzel: a = <b>12</b>.</li>
+</ol>
+<div class="rule"><b>Kontrolle:</b> Die Hypotenuse muss die größte Zahl sein. Kommt für eine Kathete ein größerer Wert
+als für c heraus, wurde addiert statt subtrahiert.</div>
+<h3>Umkehrung</h3>
+<p>Gilt in einem Dreieck a² + b² = c², dann ist es rechtwinklig. Damit lässt sich prüfen, ob ein Dreieck einen rechten Winkel hat.</p>`,
+gens:[
+ {id:"hypo", label:"Hypotenuse", make(){
+   const tri = pick([[3,4,5],[5,12,13],[8,15,17],[7,24,25],[20,21,29],[9,12,15],[6,8,10]]);
+   const f = pick([1,1,1,2,3]);
+   const [a,b,c] = tri.map(x => x*f);
+   return {q:`Ein rechtwinkliges Dreieck hat die Katheten ${m(a+" cm")} und ${m(b+" cm")}. Wie lang ist die Hypotenuse?`,
+     num:c, unit:"cm", dec:2,
+     sol:`c² = ${a}² + ${b}² = ${a*a} + ${b*b} = ${c*c} → c = <b>${c} cm</b>`};
+ }},
+ {id:"kathete", label:"Kathete", make(){
+   const tri = pick([[3,4,5],[5,12,13],[8,15,17],[7,24,25],[20,21,29]]);
+   const f = pick([1,1,2,3]);
+   const [a,b,c] = tri.map(x => x*f);
+   return {q:`In einem rechtwinkligen Dreieck ist die Hypotenuse ${m(c+" cm")} und eine Kathete ${m(b+" cm")} lang. Wie lang ist die andere Kathete?`,
+     num:a, unit:"cm", dec:2,
+     sol:`a² = ${c}² − ${b}² = ${c*c} − ${b*b} = ${a*a} → a = <b>${a} cm</b>`};
+ }},
+ {id:"anwendung", label:"Anwendungen", make(){
+   const a = R(3,15), b = R(3,15);
+   const d = Math.sqrt(a*a + b*b);
+   return {q:`Ein Rechteck ist ${m(a+" m")} lang und ${m(b+" m")} breit. Wie lang ist die Diagonale (2 Nachkommastellen)?`,
+     num:d, unit:"m", dec:2,
+     sol:`d² = ${a}² + ${b}² = ${a*a+b*b} → d = √${a*a+b*b} = <b>${fmt(d,2)} m</b>`};
+ }},
+ {id:"umkehr", label:"Rechtwinklig?", make(){
+   const recht = Math.random() < .5;
+   const tri = pick([[3,4,5],[5,12,13],[8,15,17],[6,8,10],[9,12,15]]);
+   const s = recht ? tri : [tri[0], tri[1], tri[2] + pick([1,2,-1])];
+   return {q:`Ist ein Dreieck mit den Seiten ${m(s.join(" cm, ")+" cm")} rechtwinklig?`,
+     opts:["ja","nein"], ai: recht?0:1,
+     sol:`${s[0]}² + ${s[1]}² = ${s[0]**2+s[1]**2}, aber ${s[2]}² = ${s[2]**2} → ${recht?"gleich, also rechtwinklig":"ungleich, also nicht rechtwinklig"}.`};
+ }}]});
+
+T({id:"quadgl", kl:9, title:"Quadratische Gleichungen", desc:"pq-Formel, Satz vom Nullprodukt, Diskriminante.",
+expl:`<p class="lead">Eine quadratische Gleichung enthält x². Sie hat <b>zwei, eine oder keine</b> Lösung — nie mehr als zwei.</p>
+<h3>Die pq-Formel</h3>
+<div class="rule">Die Gleichung muss zuerst in die <b>Normalform</b> gebracht werden: x² + px + q = 0.
+Vor dem x² darf nichts stehen — sonst durch diese Zahl teilen.</div>
+<div class="ex">x<sub>1,2</sub> = −${frac("p","2")} ± √( (${frac("p","2")})² − q )</div>
+<ol class="steps">
+<li>Gleichung nach Normalform sortieren, alles auf eine Seite bringen.</li>
+<li>p und q ablesen — <b>mit Vorzeichen</b>.</li>
+<li>Einsetzen und den Ausdruck unter der Wurzel (die <b>Diskriminante</b>) zuerst ausrechnen.</li>
+<li>Zwei Ergebnisse bilden: einmal plus, einmal minus.</li>
+</ol>
+<div class="ex">x² − 2x − 15 = 0 → p = −2, q = −15<br>
+x = 1 ± √(1 + 15) = 1 ± 4 → x₁ = <b>5</b>, x₂ = <b>−3</b></div>
+<h3>Wie viele Lösungen?</h3>
+<table class="tbl">
+<tr><td class="f">D &gt; 0</td><td>zwei Lösungen</td></tr>
+<tr><td class="f">D = 0</td><td>eine Lösung</td></tr>
+<tr><td class="f">D &lt; 0</td><td>keine Lösung (Wurzel aus einer negativen Zahl)</td></tr>
+</table>
+<h3>Ohne Formel geht es oft schneller</h3>
+<div class="rule">Fehlt das absolute Glied: x² − 5x = 0 → x(x − 5) = 0 → x = 0 oder x = 5 (<b>Satz vom Nullprodukt</b>).<br>
+Fehlt das x-Glied: x² − 16 = 0 → x² = 16 → x = ±4.</div>`,
+gens:[
+ {id:"pq", label:"pq-Formel", make(){
+   let x1 = Rn(-9,9), x2 = Rn(-9,9);
+   if(x1 < x2) [x1,x2] = [x2,x1];
+   const p = -(x1+x2), q = x1*x2;
+   return {q:`Löse: ${m(`x² ${pmt(p,"x")} ${pmt(q)} = 0`)}`,
+     fields:[{label:"x₁ (größere Lösung)", num:x1},{label:"x₂", num:x2}],
+     sol:`p = ${p}, q = ${q} → x = ${fmt(-p/2)} ± √(${fmt((p/2)**2)} − (${q})) = ${fmt(-p/2)} ± ${fmt(Math.sqrt((p/2)**2-q))} → x₁ = <b>${x1}</b>, x₂ = <b>${x2}</b>`};
+ }},
+ {id:"nullprodukt", label:"Ohne pq-Formel", make(){
+   if(Math.random() < .5){
+     const a = Rn(-9,9);
+     return {q:`Löse ohne pq-Formel: ${m(`x² ${pmt(a,"x")} = 0`)}`,
+       fields:[{label:"x₁ (größere Lösung)", num:Math.max(0,-a)},{label:"x₂", num:Math.min(0,-a)}],
+       sol:`x ausklammern: x(x ${pmt(a)}) = 0 → x = 0 oder x = ${-a}`};
+   }
+   const b = R(2,12);
+   return {q:`Löse: ${m(`x² − ${b*b} = 0`)}`,
+     fields:[{label:"x₁ (positiv)", num:b},{label:"x₂", num:-b}],
+     sol:`x² = ${b*b} → x = ±√${b*b} → x₁ = <b>${b}</b>, x₂ = <b>${-b}</b>`};
+ }},
+ {id:"anzahl", label:"Anzahl der Lösungen", make(){
+   const p = Rn(-8,8), q = R(-12,20);
+   const d = (p/2)**2 - q;
+   const n = d > 1e-9 ? 2 : Math.abs(d) < 1e-9 ? 1 : 0;
+   return {q:`Wie viele Lösungen hat ${m(`x² ${pmt(p,"x")} ${pmt(q)} = 0`)}?`,
+     opts:["keine","eine","zwei"], ai:n,
+     sol:`D = (${fmt(p/2)})² − (${q}) = ${fmt(d)} → ${n===2?"D > 0, also zwei":n===1?"D = 0, also eine":"D < 0, also keine"} Lösung${n===1?"":"en"}.`};
+ }},
+ {id:"normalform", label:"Erst normieren", make(){
+   const a = pick([2,3,4]), x1 = Rn(-6,6), x2 = Rn(-6,6);
+   const p = -(x1+x2), q = x1*x2;
+   const [A,B,C] = [a, a*p, a*q];
+   const hi = Math.max(x1,x2), lo = Math.min(x1,x2);
+   return {q:`Löse: ${m(`${A}x² ${pmt(B,"x")} ${pmt(C)} = 0`)}`,
+     fields:[{label:"x₁ (größere Lösung)", num:hi},{label:"x₂", num:lo}],
+     sol:`Zuerst durch ${A} teilen → x² ${pmt(p,"x")} ${pmt(q)} = 0. pq-Formel → x₁ = <b>${hi}</b>, x₂ = <b>${lo}</b>`};
+ }}]});
+
+T({id:"quadfunk", kl:9, title:"Quadratische Funktionen", desc:"Parabeln, Scheitelpunkt, Nullstellen.",
+expl:`<p class="lead">Der Graph von y = x² ist eine <b>Parabel</b>. Alle anderen quadratischen Funktionen sind verschobene, gestreckte oder gespiegelte Versionen davon.</p>
+<h3>Die Scheitelpunktform</h3>
+<div class="ex">y = a(x − d)² + e   →   Scheitelpunkt <b>S(d | e)</b></div>
+<table class="tbl">
+<tr><td class="f">a &gt; 0</td><td>nach oben geöffnet, Scheitel ist der tiefste Punkt</td></tr>
+<tr><td class="f">a &lt; 0</td><td>nach unten geöffnet, Scheitel ist der höchste Punkt</td></tr>
+<tr><td class="f">|a| &gt; 1</td><td>schmaler als die Normalparabel</td></tr>
+<tr><td class="f">|a| &lt; 1</td><td>breiter</td></tr>
+</table>
+<div class="rule"><b>Vorzeichenfalle:</b> Bei y = (x − 3)² + 2 ist der Scheitel S(3|2), bei y = (x + 3)² + 2 ist er S(−3|2).
+Im Term steht das Gegenteil von dem, was man abliest.</div>
+<h3>Von der Normalform zum Scheitel</h3>
+<ol class="steps">
+<li>Normalform: y = x² + px + q.</li>
+<li>x-Koordinate des Scheitels: d = −p : 2.</li>
+<li>y-Koordinate: d einsetzen und ausrechnen.</li>
+</ol>
+<div class="ex">y = x² − 6x + 5 → d = 3 → e = 9 − 18 + 5 = −4 → S(3|−4)</div>
+<h3>Nullstellen</h3>
+<p>Dort schneidet die Parabel die x-Achse: y = 0 setzen und die quadratische Gleichung lösen (pq-Formel).
+Keine Lösung heißt: Die Parabel schneidet die x-Achse nicht.</p>`,
+gens:[
+ {id:"scheitel", label:"Scheitelpunkt ablesen", make(){
+   const d = Rn(-7,7), e = Rn(-9,9), a = pick([1,1,1,-1,2,0.5]);
+   const aTxt = a === 1 ? "" : a === -1 ? "−" : fmt(a);
+   return {q:`Lies den Scheitelpunkt ab: ${m(`y = ${aTxt}(x ${d<0?"+ "+Math.abs(d):"− "+d})² ${pmt(e)}`)}`,
+     fields:[{label:"x-Wert von S", num:d},{label:"y-Wert von S", num:e}],
+     sol:`In der Klammer steht das Gegenteil: S(<b>${d}</b> | <b>${e}</b>). Die Parabel ist nach ${a>0?"oben":"unten"} geöffnet.`};
+ }},
+ {id:"normal2scheitel", label:"Scheitel berechnen", make(){
+   const d = Rn(-6,6), e = Rn(-9,9);
+   const p = -2*d, q = d*d + e;
+   return {q:`Bestimme den Scheitelpunkt von ${m(`y = x² ${pmt(p,"x")} ${pmt(q)}`)}.`,
+     fields:[{label:"x-Wert", num:d},{label:"y-Wert", num:e}],
+     sol:`d = −p : 2 = ${fmt(-p/2)}. Einsetzen: ${d}² ${p<0?"−":"+"} ${Math.abs(p)}·${d} ${q<0?"−":"+"} ${Math.abs(q)} = ${e} → S(<b>${d}</b> | <b>${e}</b>)`};
+ }},
+ {id:"nullstellen", label:"Nullstellen", make(){
+   let x1 = Rn(-8,8), x2 = Rn(-8,8);
+   if(x1 < x2) [x1,x2] = [x2,x1];
+   const p = -(x1+x2), q = x1*x2;
+   return {q:`Berechne die Nullstellen von ${m(`y = x² ${pmt(p,"x")} ${pmt(q)}`)}.`,
+     fields:[{label:"x₁ (größere)", num:x1},{label:"x₂", num:x2}],
+     sol:`y = 0 setzen und pq-Formel: x = ${fmt(-p/2)} ± ${fmt(Math.sqrt((p/2)**2-q))} → <b>${x1}</b> und <b>${x2}</b>`};
+ }},
+ {id:"wert", label:"Funktionswerte", make(){
+   const a = pick([1,-1,2,0.5]), d = Rn(-5,5), e = Rn(-8,8), x = Rn(-7,7);
+   const y = a*(x-d)**2 + e;
+   const aTxt = a === 1 ? "" : a === -1 ? "−" : fmt(a);
+   return {q:`Berechne ${m("f("+x+")")} für ${m(`f(x) = ${aTxt}(x ${d<0?"+ "+Math.abs(d):"− "+d})² ${pmt(e)}`)}.`,
+     num:y, dec:2,
+     sol:`(${x} ${d<0?"+":"−"} ${Math.abs(d)})² = ${(x-d)**2} → ${a===1?"":fmt(a)+" · "}${(x-d)**2} ${e<0?"−":"+"} ${Math.abs(e)} = <b>${fmt(y)}</b>`};
+ }}]});
+
+T({id:"koerper2", kl:9, title:"Prisma & Zylinder", desc:"Volumen und Oberfläche gerader Körper.",
+expl:`<p class="lead">Prisma und Zylinder sind „Türme": Eine Grundfläche wird gerade nach oben verschoben. Deshalb gilt für beide dieselbe Volumenformel.</p>
+<div class="ex"><b>V = G · h</b>  (Grundfläche mal Höhe)</div>
+<h3>Zylinder</h3>
+<table class="tbl">
+<tr><td class="f">V = π · r² · h</td><td>Grundfläche ist ein Kreis</td></tr>
+<tr><td class="f">M = 2 · π · r · h</td><td>Mantel: aufgerollt ein Rechteck mit Umfang mal Höhe</td></tr>
+<tr><td class="f">O = 2 · π · r² + M</td><td>zwei Kreise plus Mantel</td></tr>
+</table>
+<div class="rule"><b>Warum ist der Mantel ein Rechteck?</b> Schneide eine Konservendose längs auf und rolle sie ab:
+Die eine Seite ist der Kreisumfang 2πr, die andere die Höhe h.</div>
+<h3>Prisma</h3>
+<ol class="steps">
+<li>Zuerst die <b>Grundfläche</b> G berechnen — je nach Form Dreieck, Trapez oder Vieleck.</li>
+<li>V = G · h.</li>
+<li>Oberfläche: O = 2 · G + Mantel, und der Mantel ist Umfang der Grundfläche mal Höhe.</li>
+</ol>
+<div class="rule"><b>Zwei Höhen im Spiel:</b> Bei einem Dreiecksprisma gibt es die Höhe des Dreiecks (für G)
+und die Höhe des Körpers. Nicht verwechseln.</div>`,
+gens:[
+ {id:"zylinderV", label:"Zylindervolumen", make(){
+   const r = R(2,15), h = R(3,30);
+   return {q:`Ein Zylinder hat den Radius ${m(r+" cm")} und die Höhe ${m(h+" cm")}. Berechne das Volumen (2 Nachkommastellen).`,
+     num:Math.PI*r*r*h, unit:"cm³", dec:2,
+     sol:`V = π · ${r}² · ${h} = π · ${r*r*h} = <b>${fmt(Math.PI*r*r*h,2)} cm³</b>`};
+ }},
+ {id:"zylinderO", label:"Zylinderoberfläche", make(){
+   const r = R(2,12), h = R(3,25);
+   const o = 2*Math.PI*r*r + 2*Math.PI*r*h;
+   return {q:`Berechne die Oberfläche eines Zylinders mit ${m("r = "+r+" cm")} und ${m("h = "+h+" cm")} (2 Nachkommastellen).`,
+     num:o, unit:"cm²", dec:2,
+     sol:`O = 2π·${r}² + 2π·${r}·${h} = ${fmt(2*Math.PI*r*r,2)} + ${fmt(2*Math.PI*r*h,2)} = <b>${fmt(o,2)} cm²</b>`};
+ }},
+ {id:"prisma", label:"Prisma", make(){
+   const g = R(3,15), hd = R(3,12), h = R(4,25);
+   const G = g*hd/2;
+   return {q:`Ein Prisma hat als Grundfläche ein Dreieck mit der Grundseite ${m(g+" cm")} und der Höhe ${m(hd+" cm")}. Der Körper ist ${m(h+" cm")} hoch. Berechne das Volumen.`,
+     num:G*h, unit:"cm³", dec:2,
+     sol:`G = ½ · ${g} · ${hd} = ${fmt(G)} cm² → V = ${fmt(G)} · ${h} = <b>${fmt(G*h)} cm³</b>`};
+ }},
+ {id:"rueck", label:"Rückwärts", make(){
+   const r = R(2,12), h = R(4,20);
+   const v = Math.PI*r*r*h;
+   return {q:`Ein Zylinder mit dem Radius ${m(r+" cm")} hat das Volumen ${m(fmt(v,2)+" cm³")}. Wie hoch ist er?`,
+     num:h, unit:"cm", dec:2,
+     sol:`h = V : (π r²) = ${fmt(v,2)} : ${fmt(Math.PI*r*r,2)} = <b>${h} cm</b>`};
+ }}]});
+
+T({id:"wsk2", kl:9, title:"Mehrstufige Zufallsversuche", desc:"Baumdiagramm und Pfadregeln.",
+expl:`<p class="lead">Wird mehrmals hintereinander gezogen oder geworfen, hilft ein <b>Baumdiagramm</b>. Jeder Weg von oben nach unten ist ein Pfad.</p>
+<h3>Die beiden Pfadregeln</h3>
+<ol class="steps">
+<li><b>Produktregel:</b> Entlang eines Pfades werden die Wahrscheinlichkeiten <b>malgenommen</b>.</li>
+<li><b>Summenregel:</b> Führen mehrere Pfade zum gewünschten Ergebnis, werden ihre Wahrscheinlichkeiten <b>addiert</b>.</li>
+</ol>
+<div class="ex">Zweimal würfeln, zweimal eine Sechs: ${frac(1,6)} · ${frac(1,6)} = ${frac(1,36)} ≈ 2,78 %</div>
+<h3>Mit oder ohne Zurücklegen?</h3>
+<table class="tbl">
+<tr><td class="f">mit Zurücklegen</td><td>Die Wahrscheinlichkeiten bleiben in jeder Stufe gleich.</td></tr>
+<tr><td class="f">ohne Zurücklegen</td><td>Nach jedem Zug wird die Gesamtzahl kleiner — und die Anzahl der gezogenen Sorte auch.</td></tr>
+</table>
+<div class="ex">5 rote und 3 blaue Kugeln, zweimal rot <b>ohne</b> Zurücklegen:
+${frac(5,8)} · ${frac(4,7)} = ${frac(20,56)} ≈ 35,7 %</div>
+<h3>„Mindestens einmal"</h3>
+<div class="rule">Fast immer schneller über das Gegenereignis:<br>
+P(mindestens eine Sechs bei 3 Würfen) = 1 − P(keine Sechs) = 1 − (${frac(5,6)})³ ≈ 42,1 %</div>`,
+gens:[
+ {id:"mit", label:"Mit Zurücklegen", make(){
+   const r = R(2,7), b = R(2,7), n = r+b;
+   const p = (r/n)**2;
+   return {q:`In einer Urne sind ${m(r)} rote und ${m(b)} blaue Kugeln. Es wird zweimal <b>mit</b> Zurücklegen gezogen. Wie wahrscheinlich sind zwei rote? (in Prozent, 2 Nachkommastellen)`,
+     num:round(p*100,2), unit:"%", dec:2,
+     sol:`${r}/${n} · ${r}/${n} = ${fmt(p,4)} = <b>${fmt(round(p*100,2))} %</b>`};
+ }},
+ {id:"ohne", label:"Ohne Zurücklegen", make(){
+   const r = R(3,8), b = R(2,7), n = r+b;
+   const p = r/n * (r-1)/(n-1);
+   return {q:`In einer Urne sind ${m(r)} rote und ${m(b)} blaue Kugeln. Es wird zweimal <b>ohne</b> Zurücklegen gezogen. Wie wahrscheinlich sind zwei rote? (in Prozent, 2 Nachkommastellen)`,
+     num:round(p*100,2), unit:"%", dec:2,
+     sol:`${r}/${n} · ${r-1}/${n-1} = ${fmt(p,4)} = <b>${fmt(round(p*100,2))} %</b>`};
+ }},
+ {id:"mindestens", label:"Mindestens einmal", make(){
+   const n = R(2,4);
+   const p = 1 - (5/6)**n;
+   return {q:`Ein Würfel wird ${m(n+"-mal")} geworfen. Wie wahrscheinlich ist <b>mindestens eine</b> Sechs? (in Prozent, 2 Nachkommastellen)`,
+     num:round(p*100,2), unit:"%", dec:2,
+     sol:`Gegenereignis „keine Sechs": (5/6)<sup>${n}</sup> = ${fmt((5/6)**n,4)} → 1 − ${fmt((5/6)**n,4)} = <b>${fmt(round(p*100,2))} %</b>`};
+ }},
+ {id:"muenze", label:"Münzwurf", make(){
+   const n = R(3,6), k = R(0,n);
+   const binom = (n0,k0) => { let r0 = 1; for(let i = 1; i <= k0; i++) r0 = r0*(n0-k0+i)/i; return Math.round(r0); };
+   const p = binom(n,k) / 2**n;
+   return {q:`Eine Münze wird ${m(n+"-mal")} geworfen. Wie wahrscheinlich ist genau ${m(k+"-mal")} Kopf? (in Prozent, 2 Nachkommastellen)`,
+     num:round(p*100,2), unit:"%", dec:2,
+     sol:`Günstige Pfade: ${binom(n,k)} von insgesamt 2<sup>${n}</sup> = ${2**n} → <b>${fmt(round(p*100,2))} %</b>`};
+ }}]});
+
+T({id:"strahlen", kl:9, title:"Strahlensätze & Ähnlichkeit", desc:"Verhältnisse in Figuren, Vergrößern und Verkleinern.",
+expl:`<p class="lead">Zwei Figuren sind <b>ähnlich</b>, wenn sie dieselbe Form haben und sich nur in der Größe unterscheiden. Alle Seiten stehen dann im selben Verhältnis, alle Winkel sind gleich.</p>
+<h3>Der 1. Strahlensatz</h3>
+<div class="rule">Werden zwei sich schneidende Geraden von zwei <b>parallelen</b> Geraden geschnitten, dann verhalten sich
+die Abschnitte auf der einen Geraden wie die entsprechenden Abschnitte auf der anderen:</div>
+<div class="ex">${frac("ZA","ZB")} = ${frac("ZC","ZD")}</div>
+<h3>So rechnet man</h3>
+<ol class="steps">
+<li>Verhältnisgleichung aufstellen — immer <b>entsprechende</b> Strecken zusammenbringen.</li>
+<li>Über Kreuz multiplizieren.</li>
+<li>Nach der gesuchten Größe auflösen.</li>
+</ol>
+<div class="ex">${frac(4,6)} = ${frac("x",9)} → 6x = 36 → x = <b>6</b></div>
+<div class="rule"><b>Die häufigste Falle:</b> Teilstrecke und ganze Strecke verwechseln. Vom Scheitelpunkt Z aus wird
+immer die <u>ganze</u> Strecke gemessen, nicht nur das Stück zwischen den Parallelen.</div>
+<h3>Ähnliche Dreiecke</h3>
+<p>Stimmen zwei Winkel überein, sind die Dreiecke ähnlich. Der <b>Streckfaktor k</b> ist das Verhältnis
+entsprechender Seiten. Für Flächen gilt: Wird jede Länge mit k multipliziert, wächst die Fläche mit <b>k²</b>.</p>`,
+gens:[
+ {id:"strahl", label:"Strahlensatz", make(){
+   const k = pick([1.5,2,2.5,3]), a = R(3,12), c = R(4,15);
+   const b = a*k, d = c*k;
+   return {q:`Es gilt ${m(`${a} : ${fmt(b)} = ${c} : x`)}. Berechne x.`, num:d, dec:2, label:"x",
+     sol:`Über Kreuz: ${a} · x = ${fmt(b)} · ${c} → x = ${fmt(b*c)} : ${a} = <b>${fmt(d)}</b>`};
+ }},
+ {id:"schatten", label:"Anwendung", make(){
+   const hs = round(R(150,200)/100,2), ss = round(R(80,300)/100,2);
+   const sb = R(4,25);
+   const hb = round(hs/ss*sb, 2);
+   return {q:`Ein ${m(fmt(hs)+" m")} großer Mensch wirft einen Schatten von ${m(fmt(ss)+" m")}. Ein Baum wirft gleichzeitig ${m(sb+" m")} Schatten. Wie hoch ist der Baum (2 Nachkommastellen)?`,
+     num:hb, unit:"m", dec:2,
+     sol:`${fmt(hs)} : ${fmt(ss)} = h : ${sb} → h = ${fmt(hs)} · ${sb} : ${fmt(ss)} = <b>${fmt(hb,2)} m</b>`};
+ }},
+ {id:"faktor", label:"Streckfaktor", make(){
+   const k = pick([2,3,4,1.5,2.5]), a = R(3,15);
+   return {q:`Ein Dreieck wird mit dem Faktor ${m("k = "+fmt(k))} vergrößert. Eine Seite war ${m(a+" cm")} lang. Wie lang ist sie danach, und um welchen Faktor wächst der Flächeninhalt?`,
+     fields:[{label:"neue Seite", num:a*k, unit:"cm", dec:2},{label:"Faktor der Fläche", num:k*k, dec:2}],
+     sol:`Seite: ${a} · ${fmt(k)} = <b>${fmt(a*k)} cm</b>. Fläche wächst mit k² = <b>${fmt(k*k)}</b>.`};
+ }}]});
+
+/* ---------------- KLASSE 10 ---------------- */
+
+T({id:"trigo", kl:10, title:"Trigonometrie", desc:"Sinus, Kosinus, Tangens — auch im allgemeinen Dreieck.",
+expl:`<p class="lead">Im rechtwinkligen Dreieck hängen Winkel und Seitenverhältnisse fest zusammen. Drei Verhältnisse bekommen eigene Namen.</p>
+<h3>Die drei Grundformeln</h3>
+<div class="ex">sin α = ${frac("Gegenkathete","Hypotenuse")} · cos α = ${frac("Ankathete","Hypotenuse")} · tan α = ${frac("Gegenkathete","Ankathete")}</div>
+<div class="rule"><b>Merkspruch:</b> GAGA HHAG — <b>G</b>egenkathete durch <b>H</b>ypotenuse, <b>A</b>nkathete durch
+<b>H</b>ypotenuse, <b>G</b>egenkathete durch <b>A</b>nkathete.<br>
+<b>Gegenkathete</b> liegt dem Winkel gegenüber, die <b>Ankathete</b> liegt an ihm an (und ist nicht die Hypotenuse).</div>
+<h3>So gehst du vor</h3>
+<ol class="steps">
+<li>Rechten Winkel und den gefragten Winkel markieren.</li>
+<li>Die drei Seiten benennen: Hypotenuse (gegenüber vom rechten Winkel), Gegen- und Ankathete.</li>
+<li>Die Formel wählen, in der beide bekannten Größen und die gesuchte vorkommen.</li>
+<li>Nach der gesuchten Größe umstellen und rechnen.</li>
+</ol>
+<div class="rule"><b>Winkel gesucht?</b> Dann die Umkehrfunktionen benutzen: sin<sup>−1</sup>, cos<sup>−1</sup>, tan<sup>−1</sup>
+(auf dem Taschenrechner meist über die Shift-Taste). Und prüfen, ob der Rechner auf <b>DEG</b> steht.</div>
+<h3>Im allgemeinen Dreieck</h3>
+<table class="tbl">
+<tr><td class="f">Sinussatz</td><td>${frac("a","sin α")} = ${frac("b","sin β")} = ${frac("c","sin γ")}</td><td>zwei Winkel und eine Seite</td></tr>
+<tr><td class="f">Kosinussatz</td><td>c² = a² + b² − 2ab · cos γ</td><td>zwei Seiten und der Zwischenwinkel</td></tr>
+</table>
+<p>Der Kosinussatz ist der Satz des Pythagoras mit Korrekturglied: Bei γ = 90° ist cos γ = 0 und übrig bleibt c² = a² + b².</p>`,
+gens:[
+ {id:"seite", label:"Seite berechnen", make(){
+   const a = R(20,70), c = R(4,25);
+   const art = pick(["sin","cos","tan"]);
+   const v = art === "sin" ? c*Math.sin(a*Math.PI/180)
+           : art === "cos" ? c*Math.cos(a*Math.PI/180)
+                           : c*Math.tan(a*Math.PI/180);
+   const txt = art === "sin" ? `Die Hypotenuse ist ${m(c+" cm")} lang. Berechne die Gegenkathete von α`
+             : art === "cos" ? `Die Hypotenuse ist ${m(c+" cm")} lang. Berechne die Ankathete von α`
+                             : `Die Ankathete von α ist ${m(c+" cm")} lang. Berechne die Gegenkathete`;
+   return {q:`In einem rechtwinkligen Dreieck ist ${m("α = "+a+"°")}. ${txt} (2 Nachkommastellen).`,
+     num:v, unit:"cm", dec:2,
+     sol:`${art} ${a}° = ${fmt(Math[art === "tan" ? "tan" : art](a*Math.PI/180),4)} → ${c} · ${fmt(Math[art==="tan"?"tan":art](a*Math.PI/180),4)} = <b>${fmt(v,2)} cm</b>`};
+ }},
+ {id:"winkel", label:"Winkel berechnen", make(){
+   const g = R(3,20), h = g + R(2,15);
+   const a = Math.asin(g/h)*180/Math.PI;
+   return {q:`In einem rechtwinkligen Dreieck ist die Gegenkathete ${m(g+" cm")} und die Hypotenuse ${m(h+" cm")} lang. Berechne den Winkel α (2 Nachkommastellen).`,
+     num:a, unit:"°", dec:2,
+     sol:`sin α = ${g}/${h} = ${fmt(g/h,4)} → α = sin<sup>−1</sup>(${fmt(g/h,4)}) = <b>${fmt(a,2)}°</b>`};
+ }},
+ {id:"sinussatz", label:"Sinussatz", make(){
+   const A = R(30,80); let B = R(30, 150-A); if(B === A) B = A + 7; const a = R(5,25);
+   const b = a*Math.sin(B*Math.PI/180)/Math.sin(A*Math.PI/180);
+   return {q:`In einem Dreieck sind ${m("α = "+A+"°")}, ${m("β = "+B+"°")} und ${m("a = "+a+" cm")}. Berechne b (2 Nachkommastellen).`,
+     num:b, unit:"cm", dec:2,
+     sol:`b = a · sin β : sin α = ${a} · ${fmt(Math.sin(B*Math.PI/180),4)} : ${fmt(Math.sin(A*Math.PI/180),4)} = <b>${fmt(b,2)} cm</b>`};
+ }},
+ {id:"kosinussatz", label:"Kosinussatz", make(){
+   const a = R(4,20), b = R(4,20), g = R(25,140);
+   const c = Math.sqrt(a*a + b*b - 2*a*b*Math.cos(g*Math.PI/180));
+   return {q:`In einem Dreieck sind ${m("a = "+a+" cm")}, ${m("b = "+b+" cm")} und der Zwischenwinkel ${m("γ = "+g+"°")}. Berechne c (2 Nachkommastellen).`,
+     num:c, unit:"cm", dec:2,
+     sol:`c² = ${a}² + ${b}² − 2·${a}·${b}·cos ${g}° = ${fmt(a*a+b*b-2*a*b*Math.cos(g*Math.PI/180),3)} → c = <b>${fmt(c,2)} cm</b>`};
+ }}]});
+
+T({id:"koerper3", kl:10, title:"Pyramide, Kegel & Kugel", desc:"Spitze Körper und die Kugel.",
+expl:`<p class="lead">Bei spitzen Körpern steckt in der Formel immer ein Drittel — sie fassen genau ein Drittel des Körpers mit derselben Grundfläche und Höhe.</p>
+<h3>Die Formeln</h3>
+<table class="tbl">
+<tr><td class="f">Pyramide</td><td class="f">V = ⅓ · G · h</td><td>G ist die Grundfläche (Quadrat, Rechteck, Dreieck …)</td></tr>
+<tr><td class="f">Kegel</td><td class="f">V = ⅓ · π · r² · h</td><td>Mantel: M = π · r · s</td></tr>
+<tr><td class="f">Kugel</td><td class="f">V = ${frac(4,3)} · π · r³</td><td>Oberfläche: O = 4 · π · r²</td></tr>
+</table>
+<div class="rule"><b>h oder s?</b> Die <b>Höhe h</b> steht senkrecht auf der Grundfläche, die <b>Mantellinie s</b>
+läuft schräg von der Spitze zum Rand. Beide hängen über den Pythagoras zusammen: s² = r² + h².
+Für das Volumen brauchst du h, für den Mantel s.</div>
+<h3>So gehst du vor</h3>
+<ol class="steps">
+<li>Aufschreiben, was gegeben ist — und ob es h oder s ist.</li>
+<li>Fehlt eine der beiden Größen, zuerst mit Pythagoras umrechnen.</li>
+<li>Formel einsetzen, erst am Ende runden.</li>
+</ol>`,
+gens:[
+ {id:"pyramide", label:"Pyramide", make(){
+   const a = R(3,20), h = R(4,25);
+   return {q:`Eine Pyramide hat eine quadratische Grundfläche mit der Seite ${m(a+" cm")} und die Höhe ${m(h+" cm")}. Berechne das Volumen (2 Nachkommastellen).`,
+     num:a*a*h/3, unit:"cm³", dec:2,
+     sol:`G = ${a}² = ${a*a} cm² → V = ⅓ · ${a*a} · ${h} = <b>${fmt(a*a*h/3,2)} cm³</b>`};
+ }},
+ {id:"kegelV", label:"Kegel", make(){
+   const r = R(2,15), h = R(3,25);
+   return {q:`Ein Kegel hat den Radius ${m(r+" cm")} und die Höhe ${m(h+" cm")}. Berechne das Volumen (2 Nachkommastellen).`,
+     num:Math.PI*r*r*h/3, unit:"cm³", dec:2,
+     sol:`V = ⅓ · π · ${r}² · ${h} = <b>${fmt(Math.PI*r*r*h/3,2)} cm³</b>`};
+ }},
+ {id:"mantel", label:"Mantellinie & Mantel", make(){
+   const r = R(3,12), h = R(4,20);
+   const s = Math.sqrt(r*r + h*h);
+   return {q:`Ein Kegel hat den Radius ${m(r+" cm")} und die Höhe ${m(h+" cm")}. Berechne die Mantellinie s und die Mantelfläche (je 2 Nachkommastellen).`,
+     fields:[{label:"s", num:s, unit:"cm", dec:2},{label:"Mantelfläche", num:Math.PI*r*s, unit:"cm²", dec:2}],
+     sol:`s = √(${r}² + ${h}²) = √${r*r+h*h} = ${fmt(s,2)} cm → M = π · ${r} · ${fmt(s,2)} = <b>${fmt(Math.PI*r*s,2)} cm²</b>`};
+ }},
+ {id:"kugel", label:"Kugel", make(){
+   const r = R(2,15);
+   return {q:`Eine Kugel hat den Radius ${m(r+" cm")}. Berechne Volumen und Oberfläche (je 2 Nachkommastellen).`,
+     fields:[{label:"Volumen", num:4/3*Math.PI*r**3, unit:"cm³", dec:2},{label:"Oberfläche", num:4*Math.PI*r*r, unit:"cm²", dec:2}],
+     sol:`V = 4/3 · π · ${r}³ = <b>${fmt(4/3*Math.PI*r**3,2)} cm³</b> · O = 4 · π · ${r}² = <b>${fmt(4*Math.PI*r*r,2)} cm²</b>`};
+ }}]});
+
+T({id:"wachstum", kl:10, title:"Exponentielles Wachstum & Logarithmus", desc:"Wachstumsfaktor, Halbwertszeit, Gleichungen mit x im Exponenten.",
+expl:`<p class="lead">Linear heißt: <b>plus</b> jedes Mal derselbe Betrag. Exponentiell heißt: <b>mal</b> jedes Mal derselbe Faktor. Genau das macht den Unterschied so dramatisch.</p>
+<h3>Die Formel</h3>
+<div class="ex">N(t) = N<sub>0</sub> · q<sup>t</sup></div>
+<table class="tbl">
+<tr><td class="f">N₀</td><td>Anfangswert</td></tr>
+<tr><td class="f">q</td><td>Wachstumsfaktor pro Zeitschritt</td></tr>
+<tr><td class="f">t</td><td>Anzahl der Zeitschritte</td></tr>
+</table>
+<div class="rule"><b>Vom Prozentsatz zum Faktor:</b> +5 % → q = 1,05 · −5 % → q = 0,95 · Verdopplung → q = 2 ·
+Halbierung → q = 0,5.<br>q &gt; 1 bedeutet Wachstum, 0 &lt; q &lt; 1 bedeutet Abnahme.</div>
+<h3>Wenn die Zeit gesucht ist</h3>
+<p>Dann steht x im Exponenten, und man braucht den <b>Logarithmus</b>. Er beantwortet die Frage:
+„Mit welchem Exponenten muss ich die Basis potenzieren?"</p>
+<div class="ex">log<sub>2</sub>(32) = 5, denn 2⁵ = 32</div>
+<ol class="steps">
+<li>Gleichung so umstellen, dass die Potenz allein steht: q<sup>t</sup> = Wert.</li>
+<li>Logarithmieren: t = ${frac("log(Wert)","log(q)")} — mit lg oder ln, die Basis ist egal, solange sie oben und unten gleich ist.</li>
+<li>Ergebnis sinnvoll runden und im Sachzusammenhang deuten (oft aufrunden: „nach dem 8. Jahr").</li>
+</ol>
+<div class="ex">1000 · 1,05<sup>t</sup> = 2000 → 1,05<sup>t</sup> = 2 → t = log 2 : log 1,05 ≈ <b>14,2 Jahre</b></div>
+<div class="rule"><b>Halbwertszeit</b> ist die Zeit, nach der die Hälfte übrig ist, <b>Verdopplungszeit</b> die Zeit
+bis zum doppelten Wert. Beide hängen nicht vom Startwert ab.</div>`,
+gens:[
+ {id:"faktor", label:"Wachstumsfaktor", make(){
+   const p = pick([2,3,4,5,7,10,15,20,25,30]), rauf = Math.random() < .5;
+   return {q:`Ein Bestand ${rauf?"wächst":"fällt"} jährlich um ${m(p+" %")}. Wie groß ist der Wachstumsfaktor q?`,
+     num: rauf ? 1+p/100 : 1-p/100, dec:4, label:"q",
+     sol:`q = 1 ${rauf?"+":"−"} ${fmt(p/100)} = <b>${fmt(rauf?1+p/100:1-p/100)}</b>`};
+ }},
+ {id:"wert", label:"Wert nach t Schritten", make(){
+   const n0 = R(2,40)*100, p = pick([3,5,8,10,12,20]), t = R(2,10), rauf = Math.random() < .6;
+   const q = rauf ? 1+p/100 : 1-p/100;
+   const v = n0 * q**t;
+   return {q:`Ein Bestand von ${m(n0)} ${rauf?"wächst":"sinkt"} jährlich um ${m(p+" %")}. Wie groß ist er nach ${m(t+" Jahren")} (2 Nachkommastellen)?`,
+     num:v, dec:2,
+     sol:`N = ${n0} · ${fmt(q)}<sup>${t}</sup> = <b>${fmt(v,2)}</b>`};
+ }},
+ {id:"log", label:"Logarithmus", make(){
+   const b = pick([2,3,5,10]), e = R(2,6);
+   return {q:`Löse: ${m(`${b}^x = ${b**e}`)}`, num:e, label:"x",
+     sol:`${b}<sup>${e}</sup> = ${b**e} → x = log<sub>${b}</sub>(${b**e}) = <b>${e}</b>`};
+ }},
+ {id:"zeit", label:"Zeit berechnen", make(){
+   const p = pick([3,4,5,6,8,10]), ziel = pick([2,3]);
+   const q = 1+p/100;
+   const t = Math.log(ziel)/Math.log(q);
+   return {q:`Ein Kapital wächst jährlich um ${m(p+" %")}. Nach wie vielen Jahren hat es sich ${ziel===2?"verdoppelt":"verdreifacht"} (2 Nachkommastellen)?`,
+     num:t, unit:"Jahre", dec:2,
+     sol:`${fmt(q)}<sup>t</sup> = ${ziel} → t = log ${ziel} : log ${fmt(q)} = <b>${fmt(t,2)} Jahre</b>`};
+ }},
+ {id:"halbwert", label:"Halbwertszeit", make(){
+   const hw = pick([5,8,10,12,20,30]), t = hw*R(1,4);
+   const rest = 100 * 0.5**(t/hw);
+   return {q:`Ein Stoff hat die Halbwertszeit ${m(hw+" Jahre")}. Wie viel Prozent sind nach ${m(t+" Jahren")} noch übrig?`,
+     num:round(rest,2), unit:"%", dec:2,
+     sol:`${t} : ${hw} = ${t/hw} Halbwertszeiten → 100 % · 0,5<sup>${t/hw}</sup> = <b>${fmt(round(rest,2))} %</b>`};
+ }}]});
+
+T({id:"statistik", kl:10, title:"Statistik", desc:"Kennwerte, Quartile, Boxplot, Standardabweichung.",
+expl:`<p class="lead">Eine Datenreihe wird durch wenige Kennzahlen beschrieben: wo die Mitte liegt und wie stark die Werte streuen.</p>
+<h3>Lagemaße</h3>
+<table class="tbl">
+<tr><td class="f">Mittelwert</td><td>Summe : Anzahl — reagiert stark auf Ausreißer</td></tr>
+<tr><td class="f">Median</td><td>der mittlere Wert der sortierten Reihe — unempfindlich gegen Ausreißer</td></tr>
+<tr><td class="f">Modalwert</td><td>der am häufigsten vorkommende Wert</td></tr>
+</table>
+<h3>Streumaße</h3>
+<ol class="steps">
+<li><b>Spannweite</b> = größter minus kleinster Wert.</li>
+<li><b>Quartile</b>: Der Median teilt die sortierte Reihe in zwei Hälften. Das untere Quartil Q₁ ist der Median
+der unteren Hälfte, das obere Quartil Q₃ der Median der oberen.</li>
+<li><b>Interquartilsabstand</b> = Q₃ − Q₁. In diesem Bereich liegen die mittleren 50 % der Daten.</li>
+<li><b>Standardabweichung</b> s: mittlerer Abstand vom Mittelwert. Je größer s, desto stärker streuen die Werte.</li>
+</ol>
+<h3>Boxplot</h3>
+<div class="rule">Fünf Zahlen genügen für die Zeichnung: Minimum, Q₁, Median, Q₃, Maximum.
+Die Box reicht von Q₁ bis Q₃ und enthält die mittleren 50 % der Daten, der Strich darin ist der Median,
+die Antennen gehen bis zum kleinsten und größten Wert.</div>
+<div class="rule"><b>Warum reicht der Mittelwert nicht?</b> Zwei Klassen können denselben Notendurchschnitt haben —
+in der einen liegen alle bei 3, in der anderen die Hälfte bei 1 und die Hälfte bei 5. Erst die Streuung zeigt den Unterschied.</div>`,
+gens:[
+ {id:"kennwerte", label:"Mittelwert & Median", make(){
+   const n = pick([7,8,9]), v = Array.from({length:n}, () => R(1,20));
+   const s = [...v].sort((a,b)=>a-b);
+   const sum = v.reduce((a,b)=>a+b,0);
+   const med = n%2 ? s[(n-1)/2] : (s[n/2-1]+s[n/2])/2;
+   return {q:`Gegeben: ${m(v.join("; "))}<br>Berechne Mittelwert und Median.`,
+     fields:[{label:"Mittelwert", num:sum/n, dec:2},{label:"Median", num:med, dec:2}],
+     sol:`Sortiert: ${s.join("; ")} · Summe ${sum} : ${n} = <b>${fmt(sum/n,2)}</b> · Median <b>${fmt(med)}</b>`};
+ }},
+ {id:"quartile", label:"Quartile", make(){
+   const v = Array.from({length:8}, () => R(1,30));
+   const s = [...v].sort((a,b)=>a-b);
+   const q1 = (s[1]+s[2])/2, med = (s[3]+s[4])/2, q3 = (s[5]+s[6])/2;
+   return {q:`Gegeben: ${m(v.join("; "))}<br>Bestimme unteres Quartil, Median und oberes Quartil.`,
+     fields:[{label:"Q₁", num:q1, dec:2},{label:"Median", num:med, dec:2},{label:"Q₃", num:q3, dec:2}],
+     sol:`Sortiert: ${s.join("; ")} → Q₁ = <b>${fmt(q1)}</b>, Median = <b>${fmt(med)}</b>, Q₃ = <b>${fmt(q3)}</b>`};
+ }},
+ {id:"iqr", label:"Interquartilsabstand", make(){
+   const v = Array.from({length:8}, () => R(1,40));
+   const s = [...v].sort((a,b)=>a-b);
+   const q1 = (s[1]+s[2])/2, q3 = (s[5]+s[6])/2;
+   return {q:`Gegeben: ${m(v.join("; "))}<br>Wie groß ist der Interquartilsabstand?`,
+     num:q3-q1, dec:2,
+     sol:`Q₃ = ${fmt(q3)}, Q₁ = ${fmt(q1)} → Q₃ − Q₁ = <b>${fmt(q3-q1)}</b>`};
+ }},
+ {id:"standard", label:"Standardabweichung", make(){
+   const v = Array.from({length:5}, () => R(2,20));
+   const mw = v.reduce((a,b)=>a+b,0)/5;
+   const s = Math.sqrt(v.reduce((a,b)=>a+(b-mw)**2,0)/5);
+   return {q:`Gegeben: ${m(v.join("; "))}<br>Berechne die Standardabweichung (2 Nachkommastellen).`,
+     num:s, dec:2,
+     sol:`Mittelwert ${fmt(mw,2)} → mittlere quadratische Abweichung ${fmt(s*s,3)} → s = <b>${fmt(s,2)}</b>`};
+ }}]});
+</script>
+<script>
+/* ============================================================
+   3. APP
+   ============================================================ */
+const $ = s => document.querySelector(s);
+const stage = $("#stage");
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const KLASSEN = [5,6,7,8,9,10];
+
+/* Gemischte Themen pro Klasse — ziehen aus allen Themen der Stufe */
+KLASSEN.forEach(k => TOPICS.push({id:"mix"+k, kl:k, mixOf:k, title:`Klasse ${k} — gemischt`,
+  desc:`Aufgaben aus allen Themen der Klasse ${k}. Ideal als Klassenarbeit vor der Arbeit.`, gens:[]}));
+TOPICS.forEach(t => { if(t.mixOf) t.gens = TOPICS.filter(x => x.kl === t.mixOf && !x.mixOf).flatMap(x => x.gens.map(g => ({...g, _t:x}))); });
+
+const TOPIC_BY_ID = {}; TOPICS.forEach(t => TOPIC_BY_ID[t.id] = t);
+const GEN_BY_KEY = {};
+TOPICS.forEach(t => t.gens.forEach(g => { if(!g._t) GEN_BY_KEY[t.id+":"+g.id] = {t, g}; }));
+
+function makeTask(t, g){
+  const src = g._t || t;
+  const task = g.make.call(g);
+  task.key = src.id + ":" + g.id;
+  task.gl = g.label;
+  task.tt = src.title;
+  return task;
+}
+
+/* ---------- Lernstand ---------- */
+const SKEY = "rechenheft-v1";
+const Store = {
+  load(){ try { return JSON.parse(localStorage.getItem(SKEY)) || null; } catch(e){ return null; } },
+  save(d){ try { localStorage.setItem(SKEY, JSON.stringify(d)); } catch(e){} }
+};
+const MEM = Object.assign({gens:{}, exams:{}}, Store.load() || {});
+const saveMEM = () => Store.save(MEM);
+const rec = k => MEM.gens[k] || (MEM.gens[k] = {r:0, w:0, s:0});
+function mark(key, ok){
+  if(!key || !GEN_BY_KEY[key]) return false;
+  const e = rec(key);
+  if(!ok){ e.w++; e.s = 0; return false; }
+  e.r++; e.s++;
+  if(e.s >= 2 && e.w > 0){ e.w = 0; return true; }
+  return false;
+}
+const openErrors = () => Object.keys(MEM.gens).filter(k => MEM.gens[k].w > 0 && GEN_BY_KEY[k]);
+function weight(key){
+  const e = MEM.gens[key];
+  if(!e) return 2;
+  if(e.w === 0 && e.r >= 2) return 0.6;
+  if(e.w > e.r) return 4;
+  return e.w > 0 ? 3 : 1.2;
+}
+
+const stats = {ok:0, all:0, streak:0};
+let S = {topic:null, mode:"ueben", sub:null, queue:[], idx:0, cleared:false, exam:null, timer:null};
+
+/* ---------- Aufgaben ziehen ---------- */
+function genList(t){
+  if(S.sub){ const g = t.gens.find(x => x.id === S.sub || (x._t && x._t.id+":"+x.id === S.sub)); return g ? [g] : t.gens; }
+  return t.gens;
+}
+/* Jeder Aufgabentyp kommt mindestens einmal dran, danach zählt die Gewichtung:
+   Was zuletzt falsch war, wird häufiger gezogen. */
+function drawTasks(t, n){
+  const gs = genList(t);
+  const base = shuffle(gs), out = [];
+  for(let i = 0; i < n; i++){
+    let g;
+    if(i < base.length) g = base[i];
+    else {
+      const ws = gs.map(x => weight((x._t || t).id + ":" + x.id));
+      let r = Math.random() * ws.reduce((a,b) => a+b, 0), k = 0;
+      while(k < gs.length-1 && r > ws[k]){ r -= ws[k]; k++; }
+      g = gs[k];
+    }
+    out.push(makeTask(t, g));
+  }
+  return shuffle(out);
+}
+
+/* ---------- Startseite ---------- */
+function renderHome(){
+  $("#home").hidden = false; $("#drill").hidden = true; $("#subTabs").hidden = true;
+  stopTimer();
+  const n = openErrors().length;
+  let html = "";
+  if(n) html += `<div class="klasse"><h2>Wiederholen</h2><span>${n} offene Fehler</span><i class="rule"></i></div>
+    <div class="grid"><button class="topic alert" data-act="topic" data-id="fehler">
+      <span class="tname">Deine Fehler (${n})</span>
+      <span class="tdesc">Aufgabenarten, bei denen es zuletzt gehakt hat — mit neuen Zahlen.</span></button></div>`;
+  KLASSEN.forEach(k => {
+    const ts = TOPICS.filter(t => t.kl === k && !t.mixOf);
+    const mx = TOPICS.find(t => t.mixOf === k);
+    html += `<div class="klasse"><h2>Klasse ${k}</h2><span>${ts.length} Themen</span><i class="rule"></i></div><div class="grid">` +
+      ts.map(t => `<button class="topic" data-act="topic" data-id="${t.id}">
+        <span class="tname">${t.title}</span><span class="tdesc">${t.desc}</span></button>`).join("") +
+      `<button class="topic exam" data-act="topic" data-id="${mx.id}">
+        <span class="tname">${mx.title}</span><span class="tdesc">${mx.desc}</span></button></div>`;
+  });
+  $("#topicGrid").innerHTML = html;
+  window.scrollTo({top:0, behavior:"instant"});
+}
+
+/* ---------- Themenansicht ---------- */
+const ERR_TOPIC = {id:"fehler", title:"Deine Fehler", desc:"", gens:[], isErr:true};
+function modesOf(t){
+  if(t.isErr) return [["ueben","Wiederholen"]];
+  const ms = [];
+  if(t.expl) ms.push(["expl","Erklärung"]);
+  ms.push(["ueben","Üben"], ["exam","Klassenarbeit"]);
+  return ms;
+}
+function openTopic(id){
+  S.topic = id === "fehler" ? ERR_TOPIC : TOPIC_BY_ID[id];
+  S.sub = null; S.exam = null;
+  const ms = modesOf(S.topic);
+  S.mode = ms[0][0];
+  $("#home").hidden = true; $("#drill").hidden = false;
+  $("#drillTitle").textContent = S.topic.title;
+  renderModeTabs(ms);
+  renderSubTabs();
+  startMode();
+  window.scrollTo({top:0, behavior:"instant"});
+}
+function renderModeTabs(ms){
+  $("#modeTabs").innerHTML = ms.length < 2 ? "" : ms.map(([id,label]) =>
+    `<button class="mode${id==="exam"?" examtab":""}" data-act="mode" data-m="${id}" aria-selected="${S.mode===id}">${label}</button>`).join("");
+}
+function renderSubTabs(){
+  const el = $("#subTabs");
+  if(S.mode !== "ueben" || S.topic.isErr || S.topic.gens.length < 2 || S.topic.mixOf){ el.hidden = true; el.innerHTML = ""; return; }
+  el.hidden = false;
+  el.innerHTML = `<button class="sub" data-act="sub" data-s="" aria-selected="${!S.sub}">Alle Aufgabentypen</button>` +
+    S.topic.gens.map(g => `<button class="sub" data-act="sub" data-s="${g.id}" aria-selected="${S.sub===g.id}">${g.label}</button>`).join("");
+}
+function setMode(mo){
+  S.mode = mo; S.sub = null; stopTimer();
+  [...document.querySelectorAll("#modeTabs .mode")].forEach(b => b.setAttribute("aria-selected", b.dataset.m === mo));
+  renderSubTabs(); startMode();
+}
+function startMode(){
+  if(S.mode === "expl"){ stage.innerHTML = `<div class="sheet ref">${S.topic.expl}</div>`; return; }
+  if(S.mode === "exam"){ startExam(); return; }
+  if(S.topic.isErr){
+    const keys = shuffle(openErrors()).slice(0,12);
+    S.queue = keys.map(k => { const {t,g} = GEN_BY_KEY[k]; return makeTask(t,g); });
+  } else {
+    S.queue = drawTasks(S.topic, 12);
+  }
+  S.idx = 0; renderTask();
+}
+
+/* ---------- Eingabefelder ---------- */
+function inputsHTML(task){
+  return `<div class="fields">${fieldsOf(task).map((f,i) => `
+    <div class="field"><label>${f.label || "Ergebnis"}</label>
+      <div class="row"><input id="in${i}" autocomplete="off" spellcheck="false" placeholder="…">
+        ${f.unit ? `<span class="unit">${f.unit}</span>` : ""}</div></div>`).join("")}</div>`;
+}
+const readInputs = task => fieldsOf(task).map((f,i) => ($("#in"+i) || {}).value || "");
+function bindEnter(fn){
+  document.querySelectorAll(".field input").forEach((el,i,arr) => {
+    el.addEventListener("keydown", e => {
+      if(e.key !== "Enter") return;
+      e.preventDefault();
+      if(i < arr.length-1) arr[i+1].focus(); else fn();
+    });
+  });
+  const first = $("#in0"); if(first) first.focus();
+}
+
+/* ---------- Übungsmodus ---------- */
+function renderTask(){
+  if(S.idx >= S.queue.length){
+    if(!S.queue.length){
+      stage.innerHTML = `<div class="sheet"><div class="qmeta">Nichts offen</div>
+        <div class="qtext">Deine Fehlerliste ist leer.</div>
+        <p class="qsub">Alles, was du falsch hattest, konntest du danach zweimal richtig.</p>
+        <div class="actions"><button class="btn accent" data-act="home">Zu den Themen</button></div></div>`;
+      return;
+    }
+    stage.innerHTML = `<div class="sheet"><div class="qmeta">Durchgang beendet</div>
+      <div class="qtext">${S.runOk} von ${S.queue.length} richtig.</div>
+      <p class="qsub">Der nächste Durchgang würfelt neue Zahlen. Was du falsch hattest, kommt häufiger dran.</p>
+      <div class="actions"><button class="btn accent" data-act="again">Weiter üben</button>
+        <button class="btn ghost" data-act="home">Anderes Thema</button></div></div>`;
+    return;
+  }
+  if(S.idx === 0) S.runOk = 0;
+  const t = S.queue[S.idx];
+  const meta = `${S.topic.isErr || S.topic.mixOf ? t.tt + " · " : ""}${t.gl}`;
+  const body = t.opts
+    ? `<div class="answers">${t.opts.map((o,i) => `<button class="opt" data-act="opt" data-i="${i}">${o}</button>`).join("")}</div>`
+    : inputsHTML(t) + `<div class="actions"><button class="btn accent" data-act="check">Prüfen</button></div>`;
+  stage.innerHTML = `<div class="sheet"><div class="qmeta">${meta}</div>
+    <div class="qtext">${t.q}</div>
+    ${t.hint ? `<div class="qsub">Tipp: ${t.hint}</div>` : ""}
+    ${body}<div class="verdict" id="verdict"></div>
+    <div class="progress"><span>${S.idx+1} / ${S.queue.length}</span>
+      <span class="pbar"><i style="width:${Math.round(S.idx/S.queue.length*100)}%"></i></span></div></div>`;
+  if(!t.opts) bindEnter(checkTaskInput);
+}
+function finishTask(ok, t, mine){
+  stats.all++; if(ok){ stats.ok++; stats.streak++; S.runOk++; } else stats.streak = 0;
+  S.cleared = mark(t.key, ok);
+  saveMEM(); updateStats();
+  const note = S.topic.isErr ? `<span class="why">${ok ? (S.cleared ? "Aus der Fehlerliste gestrichen." : "Noch einmal richtig, dann ist die Aufgabenart raus.") : "Bleibt in der Fehlerliste."}</span>` : "";
+  const v = $("#verdict");
+  v.className = "verdict show " + (ok ? "ok" : "no");
+  v.innerHTML = (ok ? "Richtig." : `Richtig wäre: <b>${esc(solutionOf(t))}</b>${mine ? ` — du hattest <b>${esc(mine)}</b>` : ""}`) +
+    `<span class="why">${t.sol}</span>${note}
+    <div class="actions"><button class="btn accent" data-act="next">Weiter</button></div>`;
+}
+function checkTaskInput(){
+  const t = S.queue[S.idx];
+  if($("#verdict").classList.contains("show")) return;
+  const ins = readInputs(t);
+  finishTask(checkTask(t, ins), t, ins.join(" · "));
+}
+
+/* ---------- Klassenarbeit ---------- */
+function startExam(){
+  const n = S.topic.mixOf ? 14 : 10;
+  S.exam = {tasks:drawTasks(S.topic, n), idx:0, answers:[], t0:Date.now(), done:false};
+  renderExam();
+}
+function stopTimer(){ if(S.timer){ clearInterval(S.timer); S.timer = null; } }
+function examBar(){
+  const e = S.exam, total = e.tasks.length;
+  return `<div class="exambar"><span class="tag">Klassenarbeit</span>
+    <span>Aufgabe ${e.idx+1} von ${total}</span><span id="clock">00:00</span>
+    <span>keine Rückmeldung bis zum Schluss</span></div>`;
+}
+function renderExam(){
+  const e = S.exam;
+  if(e.idx >= e.tasks.length) return renderExamResult();
+  const t = e.tasks[e.idx];
+  const body = t.opts
+    ? `<div class="answers">${t.opts.map((o,i) => `<button class="opt" data-act="examopt" data-i="${i}">${o}</button>`).join("")}</div>`
+    : inputsHTML(t) + `<div class="actions"><button class="btn exam" data-act="examnext">${e.idx === e.tasks.length-1 ? "Abgeben" : "Weiter"}</button>
+        <button class="btn ghost" data-act="examskip">Überspringen</button></div>`;
+  stage.innerHTML = `<div class="sheet exam">${examBar()}
+    <div class="qmeta">${S.topic.mixOf ? t.tt + " · " : ""}${t.gl}</div>
+    <div class="qtext">${t.q}</div>
+    ${t.hint ? `<div class="qsub">Tipp: ${t.hint}</div>` : ""}
+    ${body}
+    <div class="progress"><span>${e.idx+1} / ${e.tasks.length}</span>
+      <span class="pbar exam"><i style="width:${Math.round(e.idx/e.tasks.length*100)}%"></i></span></div></div>`;
+  if(!t.opts) bindEnter(() => examNext());
+  stopTimer();
+  S.timer = setInterval(() => {
+    const el = $("#clock"); if(!el) return stopTimer();
+    const s = Math.floor((Date.now()-e.t0)/1000);
+    el.textContent = String(Math.floor(s/60)).padStart(2,"0") + ":" + String(s%60).padStart(2,"0");
+  }, 1000);
+}
+function examNext(ans){
+  const e = S.exam, t = e.tasks[e.idx];
+  e.answers[e.idx] = ans !== undefined ? ans : readInputs(t);
+  e.idx++;
+  renderExam();
+}
+const NOTEN = [[87,"1"],[73,"2"],[59,"3"],[45,"4"],[18,"5"],[0,"6"]];
+function renderExamResult(){
+  stopTimer();
+  const e = S.exam;
+  let pts = 0, max = 0;
+  const rows = e.tasks.map((t,i) => {
+    const p = fieldsOf(t).length > 1 ? 2 : 1;
+    max += p;
+    const ans = e.answers[i];
+    const ok = t.opts ? ans === t.ai : (Array.isArray(ans) && checkTask(t, ans));
+    if(ok) pts += p;
+    mark(t.key, ok);
+    const mine = t.opts ? (ans == null ? "—" : t.opts[ans]) : (Array.isArray(ans) ? ans.filter(Boolean).join(" · ") || "—" : "—");
+    const good = t.opts ? t.opts[t.ai] : solutionOf(t);
+    return `<div class="rev ${ok?"okrow":"norow"}"><div class="rq">${t.q}</div>
+      <div class="ra">Deine Antwort: <span class="${ok?"good":"mine"}">${esc(mine)}</span>${ok?"":` · richtig: <span class="good">${esc(good)}</span>`} <span style="color:var(--ink-3)">(${ok?p:0}/${p} P.)</span></div>
+      ${ok ? "" : `<div class="sol">${t.sol}</div>`}</div>`;
+  }).join("");
+  const proz = Math.round(pts/max*1000)/10;
+  const note = NOTEN.find(([g]) => proz >= g)[1];
+  const secs = Math.floor((Date.now()-e.t0)/1000);
+  const zeit = `${Math.floor(secs/60)} min ${secs%60} s`;
+  const best = MEM.exams[S.topic.id];
+  if(best == null || proz > best) MEM.exams[S.topic.id] = proz;
+  saveMEM(); updateStats();
+  stage.innerHTML = `<div class="sheet exam">
+    <div class="qmeta">Klassenarbeit · ${S.topic.title}</div>
+    <div class="result"><div class="note">${note}</div>
+      <div class="meta">${pts} von ${max} Punkten · ${fmt(proz,1)} %<br>Zeit: ${zeit}${best != null ? `<br>Bisher beste: ${fmt(best,1)} %` : ""}</div></div>
+    <div class="qsub">Notenschlüssel: ab 87 % → 1 · 73 % → 2 · 59 % → 3 · 45 % → 4 · 18 % → 5</div>
+    <div class="actions"><button class="btn exam" data-act="examagain">Neue Arbeit schreiben</button>
+      <button class="btn ghost" data-act="home">Zu den Themen</button></div>
+    <div class="review">${rows}</div></div>`;
+  window.scrollTo({top:0, behavior:"instant"});
+}
+
+/* ---------- Statistik oben ---------- */
+function updateStats(){
+  $("#statOk").textContent = stats.ok;
+  $("#statAll").textContent = stats.all;
+  $("#statStreak").textContent = stats.streak;
+  const n = openErrors().length;
+  $("#statErr").textContent = n;
+  $("#errChip").hidden = !n;
+}
+
+/* ---------- Klicks ---------- */
+document.addEventListener("click", ev => {
+  const el = ev.target.closest("[data-act]");
+  if(!el) return;
+  const a = el.dataset.act;
+  if(a === "topic")  return openTopic(el.dataset.id);
+  if(a === "mode")   return setMode(el.dataset.m);
+  if(a === "sub"){ S.sub = el.dataset.s || null; renderSubTabs(); startMode(); return; }
+  if(a === "home")   return renderHome();
+  if(a === "again"){ startMode(); return; }
+  if(a === "next"){ S.idx++; renderTask(); return; }
+  if(a === "check")  return checkTaskInput();
+  if(a === "opt"){
+    const t = S.queue[S.idx], i = +el.dataset.i;
+    if($("#verdict").classList.contains("show")) return;
+    document.querySelectorAll(".opt").forEach((b,k) => {
+      b.disabled = true;
+      if(k === t.ai) b.classList.add("right"); else if(k === i) b.classList.add("wrong");
+    });
+    return finishTask(i === t.ai, t, t.opts[i]);
+  }
+  if(a === "examnext")  return examNext();
+  if(a === "examskip")  return examNext([]);
+  if(a === "examopt")   return examNext(+el.dataset.i);
+  if(a === "examagain"){ startExam(); return; }
+});
+$("#btnBack").addEventListener("click", renderHome);
+
+renderHome();
+updateStats();
+
+/* ============================================================
+   Lernstand liegt im localStorage (Schlüssel rechenheft-v1):
+   Fehlerspeicher pro Aufgabenart und beste Klassenarbeit je
+   Thema. Für geräteübergreifende Speicherung Store.load/save
+   gegen Supabase tauschen.
+   ============================================================ */
+</script>
+</body>
+</html>
