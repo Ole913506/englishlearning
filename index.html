@@ -250,7 +250,7 @@ const VERBS = [
  V("go","goes","going","went","gone","gehen","to school",1),
  V("eat","eats","eating","ate","eaten","essen","pizza",1),
  V("drink","drinks","drinking","drank","drunk","trinken","tea",1),
- V("see","sees","seeing","saw","seen","sehen","that film",1),
+ Object.assign(V("see","sees","seeing","saw","seen","sehen","that film",1),{stat:1}),
  V("take","takes","taking","took","taken","nehmen","the bus",1),
  V("write","writes","writing","wrote","written","schreiben","a letter",1),
  V("read","reads","reading","read","read","lesen","a book",1),
@@ -263,35 +263,35 @@ const VERBS = [
  V("break","breaks","breaking","broke","broken","zerbrechen","the window",1),
  V("choose","chooses","choosing","chose","chosen","wählen","a present",1),
  V("drive","drives","driving","drove","driven","fahren","to London",1),
- V("give","gives","giving","gave","given","geben","an answer",1),
- V("know","knows","knowing","knew","known","wissen","the answer",1),
+ V("give","gives","giving","gave","given","geben","a present",1),
+ Object.assign(V("know","knows","knowing","knew","known","wissen","the answer",1),{stat:1}),
  V("grow","grows","growing","grew","grown","wachsen","tomatoes",1),
  V("throw","throws","throwing","threw","thrown","werfen","the ball",1),
  V("fly","flies","flying","flew","flown","fliegen","to Spain",1),
- V("run","runs","running","ran","run","rennen","every morning",1),
+ V("run","runs","running","ran","run","rennen","in the park",1),
  V("swim","swims","swimming","swam","swum","schwimmen","in the lake",1),
  V("sing","sings","singing","sang","sung","singen","a song",1),
  V("ring","rings","ringing","rang","rung","klingeln","the bell",1),
  V("begin","begins","beginning","began","begun","beginnen","the test",1),
  V("win","wins","winning","won","won","gewinnen","the game",1),
- V("find","finds","finding","found","found","finden","my keys",1),
- V("meet","meets","meeting","met","met","treffen","my friends",1),
+ V("find","finds","finding","found","found","finden","the keys",1),
+ V("meet","meets","meeting","met","met","treffen","the others",1),
  V("leave","leaves","leaving","left","left","verlassen","the house",1),
  V("lose","loses","losing","lost","lost","verlieren","the match",1),
  V("send","sends","sending","sent","sent","schicken","an email",1),
- V("spend","spends","spending","spent","spent","verbringen","the weekend here",1),
+ V("spend","spends","spending","spent","spent","verbringen","the weekend with friends",1),
  V("build","builds","building","built","built","bauen","a house",1),
  V("feel","feels","feeling","felt","felt","fühlen","better",1),
  V("keep","keeps","keeping","kept","kept","behalten","the money",1),
- V("sleep","sleeps","sleeping","slept","slept","schlafen","for eight hours",1),
+ V("sleep","sleeps","sleeping","slept","slept","schlafen","very well",1),
  V("tell","tells","telling","told","told","erzählen","a story",1),
- V("sell","sells","selling","sold","sold","verkaufen","his bike",1),
+ V("sell","sells","selling","sold","sold","verkaufen","old books",1),
  V("make","makes","making","made","made","machen","breakfast",1),
  V("do","does","doing","did","done","tun","the washing-up",1),
  V("have","has","having","had","had","haben","a shower",1),
  V("wear","wears","wearing","wore","worn","tragen","a jacket",1),
  V("forget","forgets","forgetting","forgot","forgotten","vergessen","the tickets",1),
- V("understand","understands","understanding","understood","understood","verstehen","the question",1),
+ Object.assign(V("understand","understands","understanding","understood","understood","verstehen","the question",1),{stat:1}),
  V("play","plays","playing","played","played","spielen","football"),
  V("watch","watches","watching","watched","watched","anschauen","TV"),
  V("study","studies","studying","studied","studied","lernen","for the test"),
@@ -300,9 +300,9 @@ const VERBS = [
  V("stop","stops","stopping","stopped","stopped","anhalten","the car"),
  V("try","tries","trying","tried","tried","versuchen","something new"),
  V("carry","carries","carrying","carried","carried","tragen","the bags"),
- V("visit","visits","visiting","visited","visited","besuchen","my grandma"),
- V("clean","cleans","cleaning","cleaned","cleaned","putzen","her room"),
- V("help","helps","helping","helped","helped","helfen","his brother"),
+ V("visit","visits","visiting","visited","visited","besuchen","the museum"),
+ V("clean","cleans","cleaning","cleaned","cleaned","putzen","the kitchen"),
+ V("help","helps","helping","helped","helped","helfen","a friend"),
  V("open","opens","opening","opened","opened","öffnen","the door")
 ];
 const IRREG = VERBS.filter(v => v.irr);
@@ -324,22 +324,22 @@ const SUBJ = [
    Baut aus Subjekt + Verb + Zeitangabe eine Lückensatz-Aufgabe.
    ============================================================ */
 const TENSE = {
- present:   {label:"Simple Present",       time:["every day","often","usually","every morning","on Mondays","always"],
+ present:   {label:"Simple Present",       time:["every day","every morning","on Mondays","twice a week","after school","at the weekend"],
              form:(s,v) => s.third ? v.s : v.inf,
              sol:(s,v) => `Simple Present: ${s.third ? "3. Person Singular, also mit -s → <b>"+v.s+"</b>" : "Grundform → <b>"+v.inf+"</b>"}`},
- progressive:{label:"Present Progressive", time:["at the moment","right now","Look!","Listen!"],
+ progressive:{label:"Present Progressive", time:["at the moment","right now","today","Look!","Look!"],
              form:(s,v) => `${s.be} ${v.ing}`, alt:(s,v) => [`${s.w==="I"?"I'm":""} ${v.ing}`.trim()],
              sol:(s,v) => `Present Progressive: am/is/are + ing-Form → <b>${s.be} ${v.ing}</b>`},
  past:      {label:"Simple Past",          time:["yesterday","last week","two days ago","in 2019","last summer"],
              form:(s,v) => v.past,
              sol:(s,v) => `Simple Past: ${v.irr ? "unregelmäßig" : "regelmäßig mit -ed"} → <b>${v.past}</b>`},
- pastprog:  {label:"Past Progressive",     time:["at eight o'clock yesterday","all evening","when the phone rang"],
+ pastprog:  {label:"Past Progressive",     time:["at eight o'clock yesterday","all evening","when the phone rang","all morning"],
              form:(s,v) => `${s.bp} ${v.ing}`,
              sol:(s,v) => `Past Progressive: was/were + ing-Form → <b>${s.bp} ${v.ing}</b>`},
- perfect:   {label:"Present Perfect",      time:["just","already","never","since 2020","for two years","ever"],
+ perfect:   {label:"Present Perfect",      time:["","","","today","this week","twice","three times","before"],
              form:(s,v) => `${s.have} ${v.pp}`,
              sol:(s,v) => `Present Perfect: have/has + 3. Verbform → <b>${s.have} ${v.pp}</b>`},
- pastperf:  {label:"Past Perfect",         time:["before that","already","by then"],
+ pastperf:  {label:"Past Perfect",         time:["before that","by then","the day before",""],
              form:(s,v) => `had ${v.pp}`,
              sol:(s,v) => `Past Perfect: had + 3. Verbform → <b>had ${v.pp}</b>`},
  will:      {label:"will-future",          time:["tomorrow","next year","in a few days","one day"],
@@ -349,15 +349,32 @@ const TENSE = {
              form:(s,v) => `${s.be} going to ${v.inf}`,
              sol:(s,v) => `going to-future: am/is/are + going to + Grundform → <b>${s.be} going to ${v.inf}</b>`}
 };
+/* Nicht jedes Verb passt zu jeder Zeit: „The boys find the keys on Mondays"
+   ist grammatisch richtig, aber inhaltlich Unsinn. Punktuelle Verben werden
+   deshalb aus Gewohnheits- und Verlaufsformen herausgehalten. */
+const NO_HAB  = ["find","lose","win","break","forget","catch","choose","begin","throw","send","grow","build","spend","keep","meet"];
+const NO_PROG = ["find","lose","win","break","forget","catch","choose","begin","understand","know","see","keep"];
+/* Verben, die keinen langen Zeitraum füllen können ("all evening") */
+const NO_LONG = ["find","lose","win","break","forget","catch","choose","begin","send","throw","give","tell","leave","take","buy","meet","open","stop","put","see","know","understand"];
+const DURATIV = v => !["find","lose","win","break","forget","catch","choose","begin","send","throw","give","tell"].includes(v.inf);
+
 function genTense(id, only){
   const t = TENSE[id];
+  const prog = ["progressive","pastprog"].includes(id);
   return {id:"form_"+id, label:t.label+" bilden", make(){
-    const s = pick(SUBJ), v = pick(only || VERBS), tm = pick(t.time);
+    let pool = only || VERBS;
+    if(id === "present") pool = pool.filter(x => !NO_HAB.includes(x.inf));
+    if(prog)             pool = pool.filter(x => !NO_PROG.includes(x.inf) && !x.stat);
+    const s = pick(SUBJ), v = pick(pool);
+    let tm = pick(t.time);
+    if(id === "present" && v.stat) tm = "";                               // He knows the answer.
+    if(prog && /^all /.test(tm) && NO_LONG.includes(v.inf)) tm = "when the phone rang";
     const form = t.form(s,v);
     const a = [form].concat(t.alt ? t.alt(s,v) : []);
+    const S0 = s.w.charAt(0).toUpperCase()+s.w.slice(1);
     const sentence = /^(Look|Listen)!$/.test(tm)
-      ? `${tm} ${s.w} ___ (${v.inf}) ${v.obj}.`
-      : `${s.w.charAt(0).toUpperCase()+s.w.slice(1)} ___ (${v.inf}) ${v.obj} ${tm}.`;
+      ? `${tm} ${S0} ___ (${v.inf}) ${v.obj}.`
+      : `${S0} ___ (${v.inf}) ${v.obj}${tm ? " " + tm : ""}.`;
     return {t:"fill", q:en(sentence), label:"Verbform", hint:`${t.label} · ${v.de}`,
             a, sol:t.sol(s,v)};
   }};
@@ -1436,10 +1453,17 @@ function makeTask(t, g){
   return task;
 }
 const fieldsOf = task => task.fields || [{label:task.label || "Antwort", a:task.a}];
+/* Übersetzungen als richtigen Satz anzeigen, nicht in Kleinschreibung */
+const prettyEn = (s, q) => {
+  let out = String(s).replace(/\bi\b/g, "I").replace(/^([a-zä-ü])/, c => c.toUpperCase());
+  if(!/[.!?]$/.test(out)) out += /\?\s*$/.test(String(q || "")) ? "?" : ".";
+  return out;
+};
 function solutionOf(task){
   if(task.t === "mc") return task.opts[task.ai];
   if(task.t === "order") return joinWords(task.a) + (task.end || "");
   if(task.t === "match") return task.pairs.map(p => p[1]).join(" · ");
+  if(task.t === "trans") return prettyEn(fieldsOf(task)[0].a[0], task.q);
   return fieldsOf(task).map(f => f.a[0]).join(" · ");
 }
 const joinWords = arr => arr.reduce((s,w) => !s ? w : (/^[,.!?]/.test(w) ? s+w : s+" "+w), "");
