@@ -1454,8 +1454,14 @@ function makeTask(t, g){
 }
 const fieldsOf = task => task.fields || [{label:task.label || "Antwort", a:task.a}];
 /* Übersetzungen als richtigen Satz anzeigen, nicht in Kleinschreibung */
+const EN_NAMEN = ["rome","london","paris","spanish","english","french","german","ireland","america",
+  "monday","tuesday","wednesday","thursday","friday","saturday","sunday","york","berlin"];
 const prettyEn = (s, q) => {
-  let out = String(s).replace(/\bi\b/g, "I").replace(/^([a-zä-ü])/, c => c.toUpperCase());
+  let out = String(s).replace(/\bi\b/g, "I");
+  EN_NAMEN.forEach(n => {
+    out = out.replace(new RegExp("\\b" + n + "\\b", "gi"), n.charAt(0).toUpperCase() + n.slice(1));
+  });
+  out = out.replace(/(^|[.!?]\s+)([a-zä-ü])/g, (m0, a, b) => a + b.toUpperCase());
   if(!/[.!?]$/.test(out)) out += /\?\s*$/.test(String(q || "")) ? "?" : ".";
   return out;
 };
