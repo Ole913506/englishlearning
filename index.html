@@ -187,6 +187,20 @@ button{font:inherit;color:inherit}
   .field input{width:100%}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* ---------- Zwei Zeiten unterscheiden ---------- */
+.duelsel{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:9px;margin-top:22px}
+.duelt{cursor:pointer;text-align:left;background:var(--bg);border:1px solid var(--line);border-radius:6px;
+  padding:11px 13px;transition:.12s}
+.duelt:hover{border-color:var(--accent);background:#fff}
+.duelt[aria-selected="true"]{border-color:var(--accent);background:var(--accent-soft);
+  box-shadow:inset 0 0 0 1px var(--accent)}
+.duelt .dn{display:block;font-weight:600;font-size:14.5px}
+.duelt .dk{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink-3);margin:3px 0 5px}
+.duelt .db{display:block;font-size:13px;font-style:italic;color:var(--accent)}
+.duelt[aria-selected="true"] .dk{color:var(--accent)}
+.duelinfo{align-self:center;font-family:var(--mono);font-size:11.5px;color:var(--ink-3)}
+.subs .pair{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}
 </style>
 </head>
 <body>
@@ -1417,6 +1431,595 @@ subs:{
 /* ============================================================
    5. APP
    ============================================================ */
+/* ============================================================
+   ZWEI ZEITEN UNTERSCHEIDEN — Teil 1: Zeitentabelle und Kontexte
+   ============================================================ */
+
+/* Die acht Zeiten aus TENSE plus das Present Perfect Progressive,
+   das es als eigenes Thema gibt, aber nicht im Formen-Generator. */
+const DUEL_DT = Object.assign({}, TENSE, {
+  perfectprog:{label:"Present Perfect Progressive",
+    form:(s,v) => `${s.have} been ${v.ing}`,
+    sol:(s,v) => `Present Perfect Progressive: have/has been + ing-Form → <b>${s.have} been ${v.ing}</b>`}
+});
+
+/* Reihenfolge für die Auswahl und für den Schlüssel eines Paares */
+const DUEL_T = ["present","progressive","past","pastprog","perfect","perfectprog","pastperf","will","goingto"];
+
+const DUEL_BSP = {
+ present:     "I play football every day.",
+ progressive: "Look! He is playing football.",
+ past:        "I played football yesterday.",
+ pastprog:    "I was playing when the phone rang.",
+ perfect:     "I have already played football.",
+ perfectprog: "I have been playing for two hours.",
+ pastperf:    "I had played before the film started.",
+ will:        "I think I will play football.",
+ goingto:     "I'm going to play football tonight."
+};
+const DUEL_KURZ = {
+ present:"Gewohnheit, Tatsache", progressive:"gerade jetzt",
+ past:"abgeschlossen, vorbei", pastprog:"lief gerade, als …",
+ perfect:"vorbei, aber mit Bezug zu jetzt", perfectprog:"läuft schon eine Weile",
+ pastperf:"noch davor passiert", will:"Vermutung, spontan",
+ goingto:"Plan, Absicht, Anzeichen"
+};
+
+/* ------------------------------------------------------------
+   Kontexte: Zeitangaben und Rahmen, die eindeutig auf eine
+   Zeitform zeigen. Der Satz entsteht als
+       vor + Subjekt + Lücke (Infinitiv) + Objekt + nach + "."
+
+   auch = Zeiten, die derselbe Kontext ebenfalls zulassen würde.
+          Gegen die darf der Kontext nicht gestellt werden, sonst
+          gäbe es zwei richtige Antworten.
+   dur  = nur Verben, die einen Zeitraum füllen können.
+------------------------------------------------------------- */
+const DUEL_KTX = {
+
+present:[
+ {nach:" every day",            auch:[], warum:"„every day“ — etwas, das regelmäßig passiert."},
+ {nach:" every morning",        auch:[], warum:"„every morning“ — eine Gewohnheit, kein einzelner Moment."},
+ {nach:" every weekend",        auch:[], warum:"„every weekend“ — ein regelmäßiger Ablauf."},
+ {nach:" on Mondays",           auch:[], warum:"„on Mondays“ mit -s heißt „jeden Montag“ — eine Gewohnheit."},
+ {nach:" twice a week",         auch:[], vb:"wied", warum:"„twice a week“ — regelmäßige Wiederholung."},
+ {nach:" three times a month",  auch:[], vb:"wied", warum:"„three times a month“ — regelmäßige Wiederholung."},
+ {nach:" every summer",         auch:[], vb:"wied", warum:"„every summer“ — jedes Jahr wieder."}
+],
+
+progressive:[
+ {nach:" right now",      auch:[], warum:"„right now“ — es passiert in diesem Moment."},
+ {nach:" at the moment",  auch:[], warum:"„at the moment“ — genau jetzt, nicht regelmäßig."},
+ {vor:"Look! ",           auch:[], vb:"lauf", warum:"„Look!“ zeigt auf etwas, das gerade vor sich geht."},
+ {vor:"Listen! ",         auch:[], vb:"lauf", warum:"„Listen!“ zeigt auf etwas, das gerade vor sich geht."},
+ {vor:"Be quiet! ",       auch:[], vb:"lauf", warum:"Die Aufforderung bezieht sich auf das, was gerade passiert."}
+],
+
+past:[
+ {nach:" yesterday",      auch:[], warum:"„yesterday“ nennt einen abgeschlossenen Zeitpunkt. Nach solchen Signalwörtern steht nie das Present Perfect."},
+ {nach:" last week",      auch:[], warum:"„last week“ — der Zeitraum ist vorbei."},
+ {nach:" last year",      auch:[], warum:"„last year“ — der Zeitraum ist vorbei."},
+ {nach:" last night",     auch:[], warum:"„last night“ — der Zeitraum ist vorbei."},
+ {nach:" two days ago",   auch:[], warum:"„… ago“ nennt einen Zeitpunkt in der Vergangenheit."},
+ {nach:" a long time ago",auch:[], warum:"„… ago“ nennt einen Zeitpunkt in der Vergangenheit."},
+ {nach:" in 2019",        auch:[], warum:"Eine Jahreszahl nennt einen abgeschlossenen Zeitpunkt."},
+ {nach:" last summer",    auch:[], warum:"„last summer“ — der Zeitraum ist vorbei."}
+],
+
+pastprog:[
+ {nach:" when the phone rang",       auch:[], vb:"lauf", warum:"Etwas lief gerade, als etwas anderes dazwischenkam."},
+ {nach:" when I came in",            auch:[], vb:"lauf", warum:"Etwas lief gerade, als etwas anderes passierte."},
+ {nach:" when it started to rain",   auch:[], vb:"lauf", warum:"Etwas lief gerade, als etwas anderes passierte."},
+ {nach:" when the teacher arrived",  auch:[], vb:"lauf", warum:"Etwas lief gerade, als etwas anderes passierte."},
+ {nach:" when the lights went out",  auch:[], vb:"lauf", warum:"Etwas lief gerade, als etwas anderes dazwischenkam."}
+],
+
+perfect:[
+ {nach:" already",                auch:[], warum:"„already“ — es ist passiert; wann genau, spielt keine Rolle."},
+ {nach:" twice this week",        auch:[], vb:"wied", warum:"„this week“ ist noch nicht vorbei — der Zeitraum reicht bis jetzt."},
+ {nach:" three times this month", auch:[], vb:"wied", warum:"„this month“ ist noch nicht vorbei — der Zeitraum reicht bis jetzt."},
+ {nach:" since 2019",             auch:["perfectprog"], vb:"lang", warum:"„since“ nennt den Anfangspunkt — die Sache reicht bis in die Gegenwart."},
+ {nach:" for two years",          auch:["perfectprog"], vb:"lang", warum:"„for“ nennt die Dauer bis jetzt."}
+],
+
+perfectprog:[
+ {nach:" all morning without a break",      auch:["perfect"], vb:"lauf", warum:"Es läuft seit einer Weile ohne Unterbrechung."},
+ {nach:" for hours now",                    auch:["perfect"], vb:"lauf", warum:"Betont wird, wie lange es schon läuft."},
+ {nach:" since this morning",               auch:["perfect"], vb:"lauf", warum:"„since“ plus noch andauernd — die Dauer steht im Vordergrund."}
+],
+
+pastperf:[
+ {vor:"When the lesson started, ",   nach:" already",        auch:[], vb:"fertig", warum:"Zwei Stufen in der Vergangenheit: Das hier war vorher schon fertig."},
+ {vor:"When the others arrived, ",   nach:" already",        auch:[], vb:"fertig", warum:"Zwei Stufen in der Vergangenheit: Das hier war vorher schon fertig."},
+ {vor:"By the time the film began, ",nach:"",                auch:[], vb:"fertig", warum:"„By the time …“ — das hier war vorher schon passiert."},
+ {vor:"After ",                      nach:", we went home",  auch:[], vb:"fertig", warum:"„After …“ — das hier kam zuerst, also eine Stufe weiter zurück."}
+],
+
+will:[
+ {nach:" tomorrow",        auch:["goingto"], warum:"Das liegt in der Zukunft."},
+ {nach:" next week",       auch:["goingto"], warum:"Das liegt in der Zukunft."},
+ {nach:" next year",       auch:["goingto"], warum:"Das liegt in der Zukunft."},
+ {nach:" in a few days",   auch:["goingto"], warum:"Das liegt in der Zukunft."},
+ {vor:"I think ",   nach:" tomorrow",   auch:[], warum:"„I think …“ — eine Vermutung ohne festen Plan, also will-future."},
+ {vor:"I'm sure ",  nach:" one day",    auch:[], warum:"„I'm sure …“ — eine Vorhersage, also will-future."},
+ {vor:"Perhaps ",   nach:" next week",  auch:[], warum:"„Perhaps …“ — unsicher, also will-future."}
+],
+
+goingto:[
+ {nach:" tonight",     auch:["will"], warum:"Das liegt in der Zukunft."},
+ {nach:" next weekend",auch:["will"], warum:"Das liegt in der Zukunft."},
+ {nach:" this evening",auch:["will"], warum:"Das liegt in der Zukunft."},
+ {vor:"It's all planned: ",   nach:" next weekend",          auch:[], vb:"wied", warum:"Der Plan steht schon fest — dafür nimmt man going to."},
+ {vor:"It's already decided: ", nach:" next month",            auch:[], vb:"wied", warum:"Die Entscheidung ist vorher gefallen — dafür nimmt man going to."},
+ {nach:" tonight — that's the plan",                           auch:[], vb:"wied", warum:"Es ist von vornherein geplant, also going to."},
+ {nach:" next weekend — it's all arranged",                    auch:[], vb:"wied", warum:"Alles ist abgesprochen: fester Plan, also going to."}
+]
+};
+
+/* ------------------------------------------------------------
+   Verbgruppen. Nicht jedes Verb passt in jeden Rahmen:
+   „I have watched TV for two years" ist grammatisch richtig und
+   trotzdem Unsinn. Kontexte mit vb: nehmen nur passende Verben.
+------------------------------------------------------------- */
+const DUEL_VG = {
+ /* beobachtbare Tätigkeiten, die eine Weile laufen */
+ lauf:  ["work","play","read","write","study","clean","watch","run","swim","drive","build",
+         "teach","sleep","sing","carry","help","eat","drink","speak","wear"],
+ /* abgeschlossene Handlungen mit Ergebnis */
+ fertig:["eat","drink","write","read","buy","make","do","clean","visit","watch","open",
+         "sell","build","send","see","leave","take","spend","study"],
+ /* wiederholbare Ereignisse — „twice a week", „every summer" */
+ wied:  ["visit","meet","play","watch","clean","help","write","buy","go","swim","run","sing",
+         "teach","study","drive","fly","eat","read","work"],
+ /* Zustände und lange Tätigkeiten — „since 2019", „for two years" */
+ lang:  ["live","work","play","teach","speak","sleep","build"]
+};
+
+/* Passt das Verb überhaupt in diese Zeit? Sonst wäre die falsche
+   Antwort schon an der Verbform zu erkennen und man lernt nichts. */
+function duelVerbOk(v, t){
+  if(t === "present") return !NO_HAB.includes(v.inf) && !v.stat;
+  if(t === "progressive" || t === "pastprog" || t === "perfectprog")
+    return !NO_PROG.includes(v.inf) && !v.stat;
+  return true;
+}
+const duelKtx = (a, b) => (DUEL_KTX[a] || []).filter(k => !k.auch.includes(b));
+
+function duelSatz(k, s, v, form){
+  const gross = !k.vor || /[.!?]\s*$/.test(k.vor);
+  const sub = gross ? s.w.charAt(0).toUpperCase() + s.w.slice(1) : s.w;
+  const mitte = form ? `<b>${form}</b>` : `___ (${v.inf})`;
+  return `${k.vor || ""}${sub} ${mitte} ${v.obj}${k.nach || ""}.`;
+}
+
+/* ------------------------------------------------------------
+   Ein Generator pro Zeitenpaar. Er würfelt bei jedem Aufruf
+   neu, welche der beiden Zeiten die richtige ist, und mischt
+   die handgeschriebenen Aufgaben des Paares dazu.
+------------------------------------------------------------- */
+function duelGen(a, b){
+  const A = DUEL_DT[a], B = DUEL_DT[b];
+  const hand = DUEL_HAND[a + "|" + b] || [];
+  const kA = duelKtx(a, b), kB = duelKtx(b, a);
+  const autoOk = kA.length && kB.length;
+  return {
+    id:"duel_" + a + "_" + b, label:A.label + " ↔ " + B.label,
+    za:a, zb:b, hand:hand.length, autoOk:!!autoOk, bag:[],
+
+    handTask(){
+      if(!this.bag.length) this.bag = shuffle(hand.slice());
+      const it = Object.assign({}, this.bag.pop());
+      if(it.opts && it.opts.length === 2 && Math.random() < .5){
+        it.opts = [it.opts[1], it.opts[0]];
+        it.ai = 1 - it.ai;
+      }
+      return it;
+    },
+
+    make(){
+      /* Ohne brauchbare Kontexte auf beiden Seiten gibt es nur
+         Handaufgaben — sonst wäre die Antwort vorhersagbar. */
+      if(!autoOk) return this.handTask();
+      if(hand.length && Math.random() < .4) return this.handTask();
+
+      const ziel  = Math.random() < .5 ? a : b;
+      const gegen = ziel === a ? b : a;
+      const ks = ziel === a ? kA : kB;
+
+      let k, s, v, fz, fg, n = 0;
+      do {
+        k = pick(ks);
+        const basis = VERBS.filter(x => duelVerbOk(x, ziel) && duelVerbOk(x, gegen));
+        let pool = basis;
+        if(k.vb)       pool = basis.filter(x => DUEL_VG[k.vb].includes(x.inf));
+        else if(k.dur) pool = basis.filter(DURATIV);
+        if(!pool.length) pool = basis;
+        s = pick(SUBJ); v = pick(pool);
+        fz = DUEL_DT[ziel].form(s, v);
+        fg = DUEL_DT[gegen].form(s, v);
+        n++;
+      } while(fz === fg && n < 12);          // z. B. read/read: dann wären beide Optionen gleich
+
+      const satz = duelSatz(k, s, v, null);
+      const loes = duelSatz(k, s, v, fz);
+      const grund = `${DUEL_DT[ziel].label} — ${k.warum}<br>Richtig: <i>${loes}</i>`;
+
+      /* Zwei Aufgabenarten: die reine Entscheidung und die Entscheidung
+         samt Form. Bei gleicher Form bleibt nur die Entscheidung. */
+      if(fz === fg || Math.random() < .5){
+        const o = shuffle([{txt:DUEL_DT[ziel].label, ok:1}, {txt:DUEL_DT[gegen].label, ok:0}]);
+        return {t:"mc", q:en(satz), hint:`${v.de} — welche Zeitform passt?`,
+                opts:o.map(x => x.txt), ai:o.findIndex(x => x.ok), sol:grund};
+      }
+      const o = shuffle([{txt:fz, ok:1}, {txt:fg, ok:0}]);
+      return {t:"mc", q:en(satz), hint:`${v.de} — welche Form passt?`,
+              opts:o.map(x => x.txt), ai:o.findIndex(x => x.ok), sol:grund};
+    }
+  };
+}
+
+/* ============================================================
+   ZWEI ZEITEN UNTERSCHEIDEN — Teil 2: Aufgaben von Hand
+   Für Paare, bei denen nicht die Zeitangabe entscheidet,
+   sondern der Sinn des Satzes. Schlüssel: zeitA|zeitB in der
+   Reihenfolge von DUEL_T.
+   ============================================================ */
+const DUEL_HAND = {
+
+"present|progressive":[
+ {t:"mc", q:en("Be quiet! The baby ___ (sleep)."), opts:["sleeps","is sleeping"], ai:1,
+  sol:"Present Progressive — es passiert gerade in diesem Moment: <i>is sleeping</i>."},
+ {t:"mc", q:en("Water ___ (boil) at 100 degrees."), opts:["boils","is boiling"], ai:0,
+  sol:"Simple Present — eine Tatsache, die immer gilt: <i>boils</i>."},
+ {t:"mc", q:en("I ___ (not understand) this exercise."), opts:["don't understand","am not understanding"], ai:0,
+  sol:"<i>understand</i> ist ein Zustandsverb (wie know, like, want, believe). Zustandsverben stehen nie in der Verlaufsform."},
+ {t:"mc", q:en("Why ___ a coat? It's warm today!"), opts:["do you wear","are you wearing"], ai:1,
+  sol:"Present Progressive — es geht um diesen Moment: <i>Why are you wearing a coat?</i>"},
+ {t:"mc", q:en("The train ___ (leave) at 8.15 every morning."), opts:["leaves","is leaving"], ai:0,
+  sol:"Simple Present — Fahrpläne und feste Abläufe: <i>leaves</i>."},
+ {t:"mc", q:en("My sister ___ in a shop, but this week she ___ in the office."),
+  opts:["works … is helping","is working … helps"], ai:0,
+  sol:"Dauerzustand im Simple Present, die Ausnahme gerade jetzt im Progressive: <i>works … is helping</i>."},
+ {t:"mc", q:en("Tom usually ___ (go) to school by bus, but today he ___ (walk)."),
+  opts:["goes … is walking","is going … walks"], ai:0,
+  sol:"„usually“ → Gewohnheit im Simple Present, „today“ → Ausnahme im Progressive."},
+ {t:"mc", q:en("She ___ (want) a new phone for her birthday."), opts:["wants","is wanting"], ai:0,
+  sol:"<i>want</i> ist ein Zustandsverb und steht nicht in der Verlaufsform: <i>wants</i>."}
+],
+
+"past|pastprog":[
+ {t:"mc", q:en("While I ___ (do) my homework, the lights went out."), opts:["did","was doing"], ai:1,
+  sol:"Past Progressive — das war der Hintergrund, in den das andere Ereignis hineinplatzte: <i>was doing</i>."},
+ {t:"mc", q:en("When the film started, we ___ (sit) in the back row."), opts:["sat","were sitting"], ai:1,
+  sol:"Past Progressive — wir saßen schon, als der Film anfing: <i>were sitting</i>."},
+ {t:"mc", q:en("She ___ her leg while she ___ ."), opts:["broke … was skiing","was breaking … skied"], ai:0,
+  sol:"Der kurze Vorfall im Simple Past, der laufende Hintergrund im Past Progressive: <i>broke … was skiing</i>."},
+ {t:"mc", q:en("Yesterday I ___ (get) up at seven."), opts:["got","was getting"], ai:0,
+  sol:"Simple Past — ein einzelner, abgeschlossener Vorgang: <i>got</i>."},
+ {t:"mc", q:en("Tom ___ the bell because he ___ to music."),
+  opts:["didn't hear … was listening","wasn't hearing … listened"], ai:0,
+  sol:"<i>hear</i> ist ein Zustandsverb (Simple Past), das Musikhören lief im Hintergrund (Past Progressive)."},
+ {t:"mc", q:en("What ___ when I called you?"), opts:["did you do","were you doing"], ai:1,
+  sol:"Past Progressive — gefragt ist, was in dem Moment gerade lief: <i>were you doing</i>."},
+ {t:"mc", q:en("First he ___ (open) the door, then he ___ (switch) on the light."),
+  opts:["opened … switched","was opening … was switching"], ai:0,
+  sol:"Zwei Handlungen nacheinander — beide im Simple Past."}
+],
+
+"past|perfect":[
+ {t:"mc", q:en("I ___ (see) that film last night."), opts:["saw","have seen"], ai:0,
+  sol:"„last night“ nennt einen abgeschlossenen Zeitpunkt. Danach steht nie das Present Perfect: <i>saw</i>."},
+ {t:"mc", q:en("I ___ that film — I don't want to watch it again."), opts:["already saw","have already seen"], ai:1,
+  sol:"Present Perfect — wann genau ist egal, wichtig ist die Folge für jetzt: <i>have already seen</i>."},
+ {t:"mc", q:en("She ___ in Berlin for ten years — and she still lives there."), opts:["lived","has lived"], ai:1,
+  sol:"Present Perfect — es reicht bis in die Gegenwart: <i>has lived</i>."},
+ {t:"mc", q:en("She ___ in Berlin for ten years, then she moved to Hamburg."), opts:["lived","has lived"], ai:0,
+  sol:"Simple Past — der Zeitraum ist abgeschlossen, sie wohnt dort nicht mehr: <i>lived</i>."},
+ {t:"mc", q:en("___ ever ___ to London?"), opts:["Did you ever go","Have you ever been"], ai:1,
+  sol:"„ever“ fragt nach Erfahrung ohne Zeitpunkt → Present Perfect: <i>Have you ever been to London?</i>"},
+ {t:"mc", q:en("When ___ your bike?"), opts:["did you buy","have you bought"], ai:0,
+  sol:"Eine Frage mit <i>When …?</i> fragt nach dem Zeitpunkt — und das geht nur im Simple Past."},
+ {t:"mc", q:en("He ___ (not finish) his homework yet."), opts:["didn't finish","hasn't finished"], ai:1,
+  sol:"„yet“ heißt „bis jetzt noch nicht“ → Present Perfect: <i>hasn't finished</i>."},
+ {t:"mc", q:en("My grandfather ___ (work) in a factory in 1975."), opts:["worked","has worked"], ai:0,
+  sol:"Eine Jahreszahl nennt einen abgeschlossenen Zeitpunkt → Simple Past: <i>worked</i>."},
+ {t:"mc", q:en("Look — somebody ___ (break) the window!"), opts:["broke","has broken"], ai:1,
+  sol:"Present Perfect — das Ergebnis ist jetzt zu sehen: <i>has broken</i>."},
+ {t:"mc", q:en("Shakespeare ___ (write) 37 plays."), opts:["wrote","has written"], ai:0,
+  sol:"Simple Past — er ist tot, es kann nichts mehr dazukommen: <i>wrote</i>."}
+],
+
+"perfect|perfectprog":[
+ {t:"mc", q:en("She ___ three emails this morning."), opts:["has written","has been writing"], ai:0,
+  sol:"Eine genaue Zahl („three emails“) zeigt auf das Ergebnis → Present Perfect: <i>has written</i>."},
+ {t:"mc", q:en("She ___ emails all morning."), opts:["has written","has been writing"], ai:1,
+  sol:"Hier zählt die Dauer, nicht das Ergebnis → Present Perfect Progressive: <i>has been writing</i>."},
+ {t:"mc", q:en("How long ___ English?"), opts:["have you learnt","have you been learning"], ai:1,
+  sol:"„How long …?“ fragt nach der Dauer → Present Perfect Progressive."},
+ {t:"mc", q:en("I ___ 50 pages so far."), opts:["have read","have been reading"], ai:0,
+  sol:"„50 pages“ ist ein zählbares Ergebnis → Present Perfect: <i>have read</i>."},
+ {t:"mc", q:en("I ___ all afternoon — my eyes hurt."), opts:["have read","have been reading"], ai:1,
+  sol:"Die Tätigkeit lief die ganze Zeit und wirkt bis jetzt nach → Present Perfect Progressive."},
+ {t:"mc", q:en("Look at her hands — she ___ the fence."), opts:["has painted","has been painting"], ai:1,
+  sol:"Die Spuren der Tätigkeit sind zu sehen, nicht das fertige Ergebnis → Present Perfect Progressive."},
+ {t:"mc", q:en("The fence is green now — she ___ it."), opts:["has painted","has been painting"], ai:0,
+  sol:"Das Ergebnis steht da, die Arbeit ist fertig → Present Perfect: <i>has painted</i>."},
+ {t:"mc", q:en("We ___ for the bus since eight o'clock."), opts:["have waited","have been waiting"], ai:1,
+  sol:"Wir warten immer noch — die Dauer steht im Vordergrund → Present Perfect Progressive."},
+ {t:"mc", q:en("We ___ Rome twice."), opts:["have visited","have been visiting"], ai:0,
+  sol:"„twice“ zählt abgeschlossene Male → Present Perfect: <i>have visited</i>."},
+ {t:"mc", q:en("He ___ (not finish) the book yet."), opts:["hasn't finished","hasn't been finishing"], ai:0,
+  sol:"<i>finish</i> beschreibt einen Abschluss, keine Dauer → Present Perfect: <i>hasn't finished</i>."},
+ {t:"mc", q:en("Sorry I'm so dirty — I ___ in the garden."), opts:["have worked","have been working"], ai:1,
+  sol:"Der Dreck ist die sichtbare Spur der Tätigkeit → Present Perfect Progressive."},
+ {t:"mc", q:en("Tom ___ his homework, so he can go out now."), opts:["has done","has been doing"], ai:0,
+  sol:"Die Arbeit ist fertig, das Ergebnis zählt → Present Perfect: <i>has done</i>."},
+ {t:"mc", q:en("How many pages ___ so far?"), opts:["have you read","have you been reading"], ai:0,
+  sol:"„How many …?“ fragt nach der Menge, also nach dem Ergebnis → Present Perfect."},
+ {t:"mc", q:en("They ___ in this house since 2015 — it's their home."),
+  opts:["have lived","have been living"], ai:0,
+  sol:"Bei <i>live</i>, <i>work</i> und <i>study</i> sind beide Formen üblich; geht es um den Dauerzustand, nimmt man das Present Perfect."},
+ {t:"mc", q:en("I'm tired — I ___ all night."), opts:["have driven","have been driving"], ai:1,
+  sol:"Die Müdigkeit ist die Folge der langen Tätigkeit → Present Perfect Progressive."},
+ {t:"mc", q:en("She ___ her keys three times this month."), opts:["has lost","has been losing"], ai:0,
+  sol:"Eine gezählte Zahl von Malen → Present Perfect: <i>has lost</i>."},
+ {t:"mc", q:en("What ___ ? Your shoes are covered in mud."),
+  opts:["have you done","have you been doing"], ai:1,
+  sol:"Gefragt ist nach der Tätigkeit, deren Spuren man sieht → Present Perfect Progressive."},
+ {t:"mc", q:en("The children ___ in the garden all afternoon."), opts:["have played","have been playing"], ai:1,
+  sol:"„all afternoon“ betont die Dauer → Present Perfect Progressive."},
+ {t:"mc", q:en("I ___ my room — you can come in."), opts:["have cleaned","have been cleaning"], ai:0,
+  sol:"Das Zimmer ist fertig, das Ergebnis zählt → Present Perfect: <i>have cleaned</i>."},
+ {t:"mc", q:en("He ___ for the test since nine o'clock and still isn't finished."),
+  opts:["has studied","has been studying"], ai:1,
+  sol:"Es läuft noch — die Dauer steht im Vordergrund → Present Perfect Progressive."}
+],
+
+"past|pastperf":[
+ {t:"mc", q:en("When we arrived at the station, the train ___ (already leave)."),
+  opts:["already left","had already left"], ai:1,
+  sol:"Past Perfect — der Zug war schon weg, bevor wir ankamen: <i>had already left</i>."},
+ {t:"mc", q:en("Yesterday I ___ (meet) my old teacher in town."), opts:["met","had met"], ai:0,
+  sol:"Simple Past — nur ein Ereignis, kein zweites davor: <i>met</i>."},
+ {t:"mc", q:en("He told me that he ___ (lose) his keys the day before."), opts:["lost","had lost"], ai:1,
+  sol:"Past Perfect — das Verlieren lag vor dem Erzählen: <i>had lost</i>."},
+ {t:"mc", q:en("After the guests ___ (go) home, we cleaned the kitchen."), opts:["went","had gone"], ai:1,
+  sol:"Nach „after“ steht die frühere Handlung im Past Perfect: <i>had gone</i>."},
+ {t:"mc", q:en("I ___ my homework and then I ___ TV."),
+  opts:["had finished … watched","finished … had watched"], ai:0,
+  sol:"Die frühere Handlung ins Past Perfect, die spätere ins Simple Past: <i>had finished … watched</i>."},
+ {t:"mc", q:en("The film ___ (begin) at eight o'clock."), opts:["began","had begun"], ai:0,
+  sol:"Simple Past — ein einzelner Zeitpunkt ohne Vorgeschichte: <i>began</i>."},
+ {t:"mc", q:en("She was tired because she ___ (not sleep) well."), opts:["didn't sleep","hadn't slept"], ai:1,
+  sol:"Der Grund lag vor dem Müdesein → Past Perfect: <i>hadn't slept</i>."}
+],
+
+"perfect|pastperf":[
+ {t:"mc", q:en("I ___ (never be) to Italy."), opts:["have never been","had never been"], ai:0,
+  sol:"Present Perfect — eine Erfahrung bis heute: <i>have never been</i>."},
+ {t:"mc", q:en("When I got there, she ___ (already go) home."), opts:["has already gone","had already gone"], ai:1,
+  sol:"Past Perfect — der Bezugspunkt liegt selbst in der Vergangenheit: <i>had already gone</i>."},
+ {t:"mc", q:en("He ___ (just finish) his lunch — come in."), opts:["has just finished","had just finished"], ai:0,
+  sol:"Present Perfect — es wirkt bis in diesen Moment: <i>has just finished</i>."},
+ {t:"mc", q:en("By 2010 they ___ (build) three new schools."), opts:["have built","had built"], ai:1,
+  sol:"„By 2010“ ist ein Punkt in der Vergangenheit, davor war es fertig → Past Perfect."},
+ {t:"mc", q:en("Sorry, I can't come — I ___ (already make) other plans."),
+  opts:["have already made","had already made"], ai:0,
+  sol:"Present Perfect — die Pläne gelten jetzt: <i>have already made</i>."}
+],
+
+"will|goingto":[
+ {t:"mc", q:en("Look at those clouds! It ___ (rain)."), opts:["will rain","is going to rain"], ai:1,
+  sol:"Man sieht jetzt die Anzeichen dafür → going to: <i>is going to rain</i>."},
+ {t:"mc", q:en("— The phone is ringing. — Don't worry, I ___ (get) it."), opts:["will get","am going to get"], ai:0,
+  sol:"Eine spontane Entscheidung im Moment des Sprechens → will: <i>I'll get it</i>."},
+ {t:"mc", q:en("We've booked the tickets. We ___ (fly) to Spain in July."),
+  opts:["will fly","are going to fly"], ai:1,
+  sol:"Der Plan steht fest und ist schon vorbereitet → going to."},
+ {t:"mc", q:en("I think our team ___ (win) the match."), opts:["will win","is going to win"], ai:0,
+  sol:"„I think …“ — eine Vermutung ohne Beweis → will."},
+ {t:"mc", q:en("— I'm cold. — I ___ (close) the window."), opts:["will close","am going to close"], ai:0,
+  sol:"Spontan, erst in diesem Moment entschieden → will."},
+ {t:"mc", q:en("She ___ (study) medicine — she has already applied."),
+  opts:["will study","is going to study"], ai:1,
+  sol:"Die Absicht stand schon vorher fest → going to."},
+ {t:"mc", q:en("In 2050 people ___ (live) on Mars, I'm sure."), opts:["will live","are going to live"], ai:0,
+  sol:"Eine Vorhersage über die ferne Zukunft → will."},
+ {t:"mc", q:en("Careful, you ___ (drop) that glass!"), opts:["will drop","are going to drop"], ai:1,
+  sol:"Es ist jetzt schon abzusehen → going to."},
+ {t:"mc", q:en("I promise I ___ (help) you tomorrow."), opts:["will help","am going to help"], ai:0,
+  sol:"Ein Versprechen → immer will."},
+ {t:"mc", q:en("— What are your plans? — We ___ (visit) my grandparents, it's all arranged."),
+  opts:["will visit","are going to visit"], ai:1,
+  sol:"Alles ist abgesprochen → going to."},
+ {t:"mc", q:en("Perhaps it ___ (be) warmer next week."), opts:["will be","is going to be"], ai:0,
+  sol:"„Perhaps“ — unsicher, nur eine Vermutung → will."},
+ {t:"mc", q:en("— Have you decided? — Yes, I ___ (buy) the red one."),
+  opts:["will buy","am going to buy"], ai:1,
+  sol:"Die Entscheidung ist vorher gefallen → going to."}
+],
+
+"progressive|goingto":[
+ {t:"mc", q:en("Look! The dog ___ (eat) your sandwich."), opts:["is eating","is going to eat"], ai:0,
+  sol:"Present Progressive — es passiert gerade jetzt."},
+ {t:"mc", q:en("Watch out — the dog ___ (eat) your sandwich!"), opts:["is eating","is going to eat"], ai:1,
+  sol:"going to — es ist gleich so weit, aber noch nicht passiert."},
+ {t:"mc", q:en("She ___ (take) her driving test next month — she has booked it."),
+  opts:["is taking","is going to take"], ai:1,
+  sol:"Eine Absicht für die Zukunft → going to. (Mit festem Termin ginge auch das Progressive — hier zeigt „has booked“ auf den Plan.)"},
+ {t:"mc", q:en("Be quiet, I ___ (listen) to the radio."), opts:["am listening","am going to listen"], ai:0,
+  sol:"Present Progressive — in diesem Moment."}
+],
+
+"present|past":[
+ {t:"mc", q:en("My father ___ (work) in a bank, but he ___ (work) in a school before."),
+  opts:["works … worked","worked … works"], ai:0,
+  sol:"Jetzt im Simple Present, früher im Simple Past."},
+ {t:"mc", q:en("Columbus ___ (reach) America in 1492."), opts:["reaches","reached"], ai:1,
+  sol:"Eine Jahreszahl in der Vergangenheit → Simple Past."},
+ {t:"mc", q:en("The sun ___ (rise) in the east."), opts:["rises","rose"], ai:0,
+  sol:"Eine Tatsache, die immer gilt → Simple Present."}
+]
+};
+
+/* ============================================================
+   ZWEI ZEITEN UNTERSCHEIDEN — Teil 3: Thema und Auswahl
+   ============================================================ */
+
+const DUEL_PAARE = [];
+for(let i = 0; i < DUEL_T.length; i++)
+  for(let j = i + 1; j < DUEL_T.length; j++) DUEL_PAARE.push([DUEL_T[i], DUEL_T[j]]);
+
+const DUEL_GENS = DUEL_PAARE.map(([a,b]) => duelGen(a,b));
+const DUEL_BY_ID = {}; DUEL_GENS.forEach(g => DUEL_BY_ID[g.id] = g);
+
+/* Die Paare, die in Klassenarbeiten wirklich drankommen */
+const DUEL_KLASSIKER = [
+ ["present","progressive"], ["past","perfect"], ["past","pastprog"],
+ ["past","pastperf"], ["perfect","perfectprog"], ["will","goingto"]
+];
+
+T({id:"tenseduel", kat:"Zeitformen", duel:true,
+title:"Zwei Zeiten unterscheiden",
+desc:"Du wählst zwei Zeitformen — und entscheidest dann Satz für Satz, welche von beiden passt.",
+expl:`<p class="lead">Die Formen zu bilden ist das eine. Das andere — und das, woran es in der Klassenarbeit
+hängt — ist die Entscheidung: <b>welche</b> Zeit gehört hier hin? Dieser Modus übt nur das.
+Du suchst dir zwei Zeiten aus, und danach kommen Sätze, in denen genau eine der beiden richtig ist.</p>
+
+<h3>Die Frage, die fast immer entscheidet</h3>
+<p>Nicht „was ist passiert?“, sondern <b>„was will der Satz über die Zeit sagen?“</b>
+Vier Fragen reichen meistens:</p>
+<ol class="steps">
+<li><b>Regelmäßig oder gerade jetzt?</b> → Simple Present gegen Present Progressive.</li>
+<li><b>Abgeschlossen oder bis jetzt?</b> → Simple Past gegen Present Perfect.
+  Faustregel: Sobald ein Zeitpunkt genannt wird, der vorbei ist (<i>yesterday, in 2019, last week</i>),
+  geht nur Simple Past.</li>
+<li><b>Ergebnis oder Dauer?</b> → Present Perfect gegen Present Perfect Progressive.
+  Steht eine Zahl im Satz („three emails“), zählt das Ergebnis.</li>
+<li><b>Vorhersage oder Plan?</b> → will gegen going to. Spontan und vermutet → will.
+  Vorher entschieden oder jetzt schon absehbar → going to.</li>
+</ol>
+
+<h3>Signalwörter — aber mit Vorsicht</h3>
+<table class="tbl">
+<tr><th>Zeit</th><th>typische Signale</th></tr>
+<tr><td>Simple Present</td><td class="e">every day, on Mondays, usually, always, twice a week</td></tr>
+<tr><td>Present Progressive</td><td class="e">now, right now, at the moment, Look!, Listen!</td></tr>
+<tr><td>Simple Past</td><td class="e">yesterday, last week, … ago, in 2019, When …?</td></tr>
+<tr><td>Past Progressive</td><td class="e">while, when … (das andere lief schon)</td></tr>
+<tr><td>Present Perfect</td><td class="e">already, yet, just, ever, never, so far, this week</td></tr>
+<tr><td>Present Perfect Progressive</td><td class="e">How long …?, for, since — und es läuft noch</td></tr>
+<tr><td>Past Perfect</td><td class="e">after, before, by the time, … already (in der Vergangenheit)</td></tr>
+<tr><td>will-future</td><td class="e">I think, I'm sure, perhaps, probably, I promise</td></tr>
+<tr><td>going to-future</td><td class="e">ein Plan, eine Absicht, sichtbare Anzeichen</td></tr>
+</table>
+<div class="rule"><b>Signalwörter sind Hinweise, keine Beweise.</b>
+<i>for</i> und <i>since</i> stehen bei beiden Perfect-Formen, <i>when</i> bei Simple Past und
+Past Progressive. Entscheidend bleibt der Sinn des Satzes.</div>
+
+<h3>Die drei Fallen für Deutschsprachige</h3>
+<ol class="steps">
+<li><b>„Ich habe es gestern gemacht“ ist nicht <i>I have done it yesterday</i>.</b>
+  Das deutsche Perfekt ist kein englisches Present Perfect. Mit <i>yesterday</i> nur Simple Past.</li>
+<li><b>Zustandsverben kennen keine Verlaufsform.</b>
+  <i>know, understand, like, want, believe, need, see, hear</i> — nie mit -ing.</li>
+<li><b>Nach <i>When …?</i> als Frage steht Simple Past.</b>
+  <i>When did you buy it?</i> — nie <i>When have you bought it?</i></li>
+</ol>
+
+<h3>So läuft der Modus</h3>
+<p>Zwei Zeiten auswählen, dann 12 Aufgaben pro Durchgang. Mal stehen die beiden
+<b>Namen</b> der Zeitformen zur Wahl, mal die beiden fertigen <b>Verbformen</b>.
+Unter jeder Lösung steht, woran man es erkennt. Was du falsch hattest, landet in der
+Fehlerliste auf der Startseite und kommt häufiger dran — zweimal richtig, und es ist wieder raus.
+Über „Klassenarbeit“ bekommst du dasselbe Paar ohne Rückmeldung und mit Note am Ende.</p>`,
+gens: DUEL_GENS,
+mixGens: DUEL_KLASSIKER.map(([a,b]) => DUEL_BY_ID["duel_" + a + "_" + b])
+});
+
+/* ------------------------------------------------------------
+   Auswahlbildschirm
+------------------------------------------------------------- */
+function duelStand(g){
+  const e = MEM.gens["tenseduel:" + g.id];
+  if(!e || !(e.r + e.w)) return "noch nicht geübt";
+  return `${e.r} richtig${e.w ? " · " + e.w + " offen" : ""}`;
+}
+
+function renderDuelPick(){
+  const sel = S.duelSel || (S.duelSel = []);
+  const fertig = sel.length === 2;
+  const info = fertig ? DUEL_DT[sel[0]].label + " ↔ " + DUEL_DT[sel[1]].label
+    : sel.length === 1 ? "Jetzt noch die zweite Zeit." : "Zwei Zeiten antippen.";
+
+  let html = `<div class="sheet">
+    <div class="qmeta">Schritt 1 von 2</div>
+    <div class="qtext">Welche zwei Zeiten willst du auseinanderhalten?</div>
+    <p class="qsub">Tippe genau zwei an. Danach kommen Sätze, in denen immer nur eine der beiden
+      richtig ist — mal musst du den Namen der Zeitform wählen, mal die fertige Verbform.</p>
+    <div class="duelsel">${DUEL_T.map(id => `
+      <button class="duelt" data-act="duelsel" data-z="${id}" aria-selected="${sel.includes(id)}">
+        <span class="dn">${DUEL_DT[id].label}</span>
+        <span class="dk">${DUEL_KURZ[id]}</span>
+        <span class="db">${esc(DUEL_BSP[id])}</span></button>`).join("")}</div>
+    <div class="actions">
+      <button class="btn accent" data-act="duelgo"${fertig ? "" : " disabled"}>Los geht's</button>
+      <span class="duelinfo">${esc(info)}</span></div></div>
+
+    <div class="sect"><h2>Die häufigsten Paare</h2><span>direkt loslegen</span><i></i></div>
+    <div class="grid">${DUEL_KLASSIKER.map(([a,b]) => {
+      const g = DUEL_BY_ID["duel_" + a + "_" + b];
+      return `<button class="topic" data-act="duelpair" data-s="${g.id}">
+        <span class="tname">${g.label}</span>
+        <span class="tdesc">${duelStand(g)}</span></button>`;
+    }).join("")}</div>`;
+
+  /* Paare, an denen zuletzt etwas hakte */
+  const offen = DUEL_GENS.filter(g => (MEM.gens["tenseduel:" + g.id] || {}).w > 0);
+  if(offen.length) html += `<div class="sect"><h2>Da hakt es noch</h2><span>${offen.length} Paare</span><i></i></div>
+    <div class="grid">${offen.map(g => `<button class="topic alert" data-act="duelpair" data-s="${g.id}">
+      <span class="tname">${g.label}</span><span class="tdesc">${duelStand(g)}</span></button>`).join("")}</div>`;
+
+  stage.innerHTML = html;
+}
+
+/* Klicks des Auswahlbildschirms */
+document.addEventListener("click", ev => {
+  const el = ev.target.closest("[data-act]");
+  if(!el || !S.topic || !S.topic.duel) return;
+  const a = el.dataset.act;
+
+  if(a === "duelsel"){
+    const z = el.dataset.z, sel = S.duelSel || (S.duelSel = []);
+    const i = sel.indexOf(z);
+    if(i >= 0) sel.splice(i, 1);
+    else { sel.push(z); if(sel.length > 2) sel.shift(); }
+    return renderDuelPick();
+  }
+  if(a === "duelgo"){
+    const sel = S.duelSel || [];
+    if(sel.length !== 2) return;
+    const [x,y] = sel.slice().sort((p,q) => DUEL_T.indexOf(p) - DUEL_T.indexOf(q));
+    S.sub = "duel_" + x + "_" + y;
+    renderSubTabs(); startMode();
+    return;
+  }
+  if(a === "duelpair"){
+    const g = DUEL_BY_ID[el.dataset.s];
+    if(!g) return;
+    S.duelSel = [g.za, g.zb];
+    S.sub = g.id;
+    renderSubTabs(); startMode();
+    return;
+  }
+  if(a === "duelback"){
+    S.sub = null; stopTimer();
+    renderSubTabs(); startMode();
+    return;
+  }
+});
+
+
 const $ = s => document.querySelector(s);
 const stage = $("#stage");
 const KATS = ["Zeitformen","Grammatik","Wörter & Satzbau"];
@@ -1437,7 +2040,8 @@ TOPICS.forEach(t => {
 /* Gemischte Themen je Bereich */
 KATS.forEach(k => TOPICS.push({id:"mix-"+slug(k), kat:k, mixOf:k, title:k + " — gemischt",
   desc:`Aufgaben aus allen Themen des Bereichs ${k}. Gut als Klassenarbeit.`, gens:[]}));
-TOPICS.forEach(t => { if(t.mixOf) t.gens = TOPICS.filter(x => x.kat === t.mixOf && !x.mixOf).flatMap(x => x.gens.map(g => Object.assign({}, g, {_t:x}))); });
+/* mixGens: Themen dürfen für die gemischte Arbeit eine kleinere Auswahl angeben. */
+TOPICS.forEach(t => { if(t.mixOf) t.gens = TOPICS.filter(x => x.kat === t.mixOf && !x.mixOf).flatMap(x => (x.mixGens || x.gens).map(g => Object.assign({}, g, {_t:x}))); });
 
 const TOPIC_BY_ID = {}; TOPICS.forEach(t => TOPIC_BY_ID[t.id] = t);
 const GEN_BY_KEY = {};
@@ -1573,18 +2177,28 @@ function openTopic(id){
 }
 function renderSubTabs(){
   const el = $("#subTabs");
+  if(S.topic.duel){
+    if(!S.sub || S.mode === "expl"){ el.hidden = true; el.innerHTML = ""; return; }
+    const g = DUEL_BY_ID[S.sub];
+    el.hidden = false;
+    el.innerHTML = `<button class="subbtn" data-act="duelback">‹ Andere Zeiten wählen</button>
+      <span class="subbtn pair">${g ? g.label : ""}</span>`;
+    return;
+  }
   if(S.mode !== "ueben" || S.topic.isErr || S.topic.mixOf || S.topic.gens.length < 2){ el.hidden = true; el.innerHTML = ""; return; }
   el.hidden = false;
   el.innerHTML = `<button class="subbtn" data-act="sub" data-s="" aria-selected="${!S.sub}">Alle Aufgaben</button>` +
     S.topic.gens.map(g => `<button class="subbtn" data-act="sub" data-s="${g.id}" aria-selected="${S.sub===g.id}">${g.label}</button>`).join("");
 }
 function setMode(mo){
-  S.mode = mo; S.sub = null; stopTimer();
+  const paar = S.topic.duel ? S.sub : null;        // gewähltes Zeitenpaar über den Moduswechsel retten
+  S.mode = mo; S.sub = paar; stopTimer();
   [...document.querySelectorAll("#modeTabs .mode")].forEach(b => b.setAttribute("aria-selected", b.dataset.m === mo));
   renderSubTabs(); startMode();
 }
 function startMode(){
   if(S.mode === "expl"){ stage.innerHTML = `<div class="sheet ref">${S.topic.expl}</div>`; return; }
+  if(S.topic.duel && !S.sub) return renderDuelPick();   // erst die beiden Zeiten wählen
   if(S.mode === "exam"){ startExam(); return; }
   if(S.topic.isErr){
     S.queue = shuffle(openErrors()).slice(0,12).map(k => { const {t,g} = GEN_BY_KEY[k]; return makeTask(t,g); });
@@ -1778,11 +2392,12 @@ function renderExamResult(){
   const proz = Math.round(pts/max*1000)/10;
   const note = NOTEN.find(([g]) => proz >= g)[1];
   const secs = Math.floor((Date.now()-e.t0)/1000);
-  const best = MEM.exams[S.topic.id];
-  if(best == null || proz > best) MEM.exams[S.topic.id] = proz;
+  const ekey = S.topic.duel && S.sub ? S.topic.id + ":" + S.sub : S.topic.id;
+  const best = MEM.exams[ekey];
+  if(best == null || proz > best) MEM.exams[ekey] = proz;
   saveMEM(); updateStats();
   stage.innerHTML = `<div class="sheet exam">
-    <div class="qmeta">Klassenarbeit · ${S.topic.title}</div>
+    <div class="qmeta">Klassenarbeit · ${S.topic.duel && DUEL_BY_ID[S.sub] ? DUEL_BY_ID[S.sub].label : S.topic.title}</div>
     <div class="result"><div class="note">${note}</div>
       <div class="meta">${pts} von ${max} Punkten · ${String(proz).replace(".",",")} %<br>
       Zeit: ${Math.floor(secs/60)} min ${secs%60} s${best != null ? `<br>Bisher beste: ${String(best).replace(".",",")} %` : ""}</div></div>
